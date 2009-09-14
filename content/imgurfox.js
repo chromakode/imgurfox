@@ -16,9 +16,13 @@ var ImgurFoxWindow = (function() {
         let contextMenu = document.getElementById("contentAreaContextMenu");
         let uploadMenuItem = document.getElementById("context-imgur");
         contextMenu.addEventListener("popupshowing", function(event) {
-            // FIXME: Can imgur take https URLs?
-            let schemeOk = gContextMenu.target.currentURI.scheme == "http";
-            uploadMenuItem.hidden = !(gContextMenu.onImage && schemeOk);
+            if (gContextMenu.onImage) {
+                // TODO: Can imgur take https or ftp URL schemes?
+                let schemeOk = gContextMenu.target.currentURI.scheme == "http"
+                uploadMenuItem.hidden = !schemeOk;
+            } else {
+                uploadMenuItem.hidden = true;
+            }
         }, false)
     },
     
