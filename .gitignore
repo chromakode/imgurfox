@@ -1,0 +1,9 @@
+*.pyc
+*~
+socialite.xpi
+.settings
+.project
+.pydevproject
+
+buildxpi_config_local.py
+update.rdf

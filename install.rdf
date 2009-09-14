@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+
+<RDF:RDF xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <RDF:Description RDF:about="urn:mozilla:install-manifest">
+    <em:id>imgurfox@imgur.com</em:id>
+    <em:version>0.1pre1</em:version>
+    <em:type>2</em:type>
+
+    <em:targetApplication>
+      <RDF:Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+        <em:minVersion>3.0</em:minVersion>
+        <em:maxVersion>3.5.*</em:maxVersion>
+      </RDF:Description>
+    </em:targetApplication>
+   
+    <em:name>ImgurFox</em:name>
+    <em:description>Uploads images to imgur.com.</em:description>
+    <em:creator>ImgurFox Team</em:creator>
+    <em:developer>Chromakode</em:developer>
+    <em:developer>Koryk</em:developer>
+    <em:iconURL>chrome://imgurfox/skin/imgurfox.png</em:iconURL>
+    <em:homepageURL>http://www.imgur.com/</em:homepageURL>
+  </RDF:Description>      
+</RDF:RDF>
+

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://imgurfox/skin/imgurfox.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://imgurfox/locale/imgurfox.dtd">
+<overlay id="imgurfox-overlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="imgurfox.js" type="application/javascript;version=1.8"/>
+  
+  <popup id="contentAreaContextMenu">
+    <menuitem id="context-imgur"
+              insertafter="context-saveimage"
+              label="&uploadImageCmd.label;"
+              accesskey="&uploadImageCmd.accesskey;"
+              oncommand="ImgurFoxWindow.contextUpload(event);"/>
+  </popup>
+</overlay>
