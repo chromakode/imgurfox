@@ -1,7 +1,8 @@
 var ImgurFoxWindow = (function() {
   let modules = {};
   let importModule = function(name) Components.utils.import(name, modules);
-
+  let extensionReg = "gif jpg jpeg png";
+  
   function uploadURL(imgSrc) {
     return "http://imgur.com/api/upload/?url=" + imgSrc
   }
