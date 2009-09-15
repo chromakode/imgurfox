@@ -20,7 +20,12 @@ var ImgurFoxWindow = (function() {
                 // TODO: Can imgur take https or ftp URL schemes?
                 let schemeOk = gContextMenu.target.currentURI.scheme == "http"
                 uploadMenuItem.hidden = !schemeOk;
-            } else {
+            } else if (gContextMenu.onLink) {
+                let extension = gContextMenu.linkURL.split(".").pop();
+                if (extension != null)
+                  uploadMenuItem.hidden = !(extensionReg.match(extension)==extension);
+            }            
+            else {
                 uploadMenuItem.hidden = true;
             }
         }, false)
@@ -31,7 +36,11 @@ var ImgurFoxWindow = (function() {
     },
     
     contextUpload: function(event) {
-        openUILinkIn(uploadURL(gContextMenu.imageURL), "tab");
+
+        if (gContextMenu.onImage)
+          openUILinkIn(uploadURL(gContextMenu.imageURL), "tab");
+        else if (gContextMenu.onLink)
+          openUILinkIn(uploadURL(gContextMenu.linkURL), "tab");
     },
 
   }
