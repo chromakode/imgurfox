@@ -1,15 +1,21 @@
 var ImgurFoxWindow = (function() {
-  let modules = {};
-  let importModule = function(name) Components.utils.import(name, modules);
+  let extension = Application.extensions.get("imgurfox@imgur.com");
+  let stringBundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
+                               .getService(Components.interfaces.nsIStringBundleService)
+                               .createBundle("chrome://imgurfox/locale/imgurfox.properties");
   
-  let extensionReg = /\.(jpg|jpeg|gif|png|apng|tiff|bmp|pdf|xcf)(\?.*)?$/i;
+  let imageFileReg = /\.(jpg|jpeg|gif|png|apng|tiff|bmp|pdf|xcf)(\?.*)?$/i;
+  
+  CONTEXT_CHOICE = 0;
+  CONTEXT_UPLOAD = 1;
+  CONTEXT_EDIT   = 2;
   
   function uploadURL(imgSrc) {
     return "http://imgur.com/api/upload?url=" + imgSrc;
   }
   
   function editURL(imgSrc) {
-    return "http://imgur.com/api/edit?url=" + imgSrc;
+    return "http://imgur.com/api/upload?edit&url=" + imgSrc;
   }
 
   var ImgurFoxWindow = {
@@ -18,25 +24,49 @@ var ImgurFoxWindow = (function() {
       window.addEventListener("unload", ImgurFoxWindow.onUnload, false);
     },
     
+    get contextImageURI() {
+      if (gContextMenu.onImage) {
+        // Right clicked on an image
+        return gContextMenu.target.currentURI;
+      } else if (gContextMenu.onLink && imageFileReg.test(gContextMenu.linkURL)) {
+        // Right clicked on a link to an image
+        return gContextMenu.linkURI;
+      }
+      return false;
+    },
+    
     onLoad: function() {
       let contextMenu = document.getElementById("contentAreaContextMenu");
-      let uploadMenuItem = document.getElementById("context-imgur");
       contextMenu.addEventListener("popupshowing", function(event) {
-        let imageURI = null;
-        if (gContextMenu.onImage) {
-          // Right clicked on an image
-          imageURI = gContextMenu.target.currentURI;
-        } else if (gContextMenu.onLink && extensionReg.test(gContextMenu.linkURL)) {
-          // Right clicked on a link to an image
-          imageURI = gContextMenu.linkURI;
-        }
+        let uploadMenuItem = document.getElementById("context-imgur");
+        let uploadMenuChoice = document.getElementById("context-imgur-choice");
         
+        let showMenuItem;
+        let imageURI = ImgurFoxWindow.contextImageURI;
         if (imageURI) {
           // TODO: Can imgur take https or ftp URL schemes?
-          schemeOk = imageURI.scheme == "http";
-          uploadMenuItem.hidden = !schemeOk;
+          showMenuItem = imageURI.scheme == "http";
+        } else {
+          showMenuItem = false;
+        }
+        
+        if (showMenuItem) {
+          let contextAction = extension.prefs.get("defaultContextAction").value;
+          let isChoice = contextAction == CONTEXT_CHOICE;
+          
+          uploadMenuItem.hidden = isChoice;
+          uploadMenuChoice.hidden = !isChoice;
+          
+          if (!isChoice) {
+            if (contextAction == CONTEXT_UPLOAD) {
+                uploadMenuItem.label = stringBundle.GetStringFromName("uploadImageCmd.label");
+            } else {
+                uploadMenuItem.label = stringBundle.GetStringFromName("editImageCmd.label");
+            }
+          }
         } else {
           uploadMenuItem.hidden = true;
+          uploadMenuChoice.hidden = true;
         }
       }, false)
     },
@@ -45,11 +75,12 @@ var ImgurFoxWindow = (function() {
       // :(
     },
     
-    contextUpload: function(event) {
-      if (gContextMenu.onImage)
-        openUILinkIn(uploadURL(gContextMenu.imageURL), "tab");
-      else if (gContextMenu.onLink)
-        openUILinkIn(uploadURL(gContextMenu.linkURL), "tab");
+    contextUpload: function(event, edit) {
+      if (edit == null) {
+        edit = extension.prefs.get("defaultContextAction").value == CONTEXT_EDIT;
+      }
+      let actionURL = edit ? editURL : uploadURL;
+      openUILinkIn(actionURL(ImgurFoxWindow.contextImageURI.spec), "tab");
     },
 
   }

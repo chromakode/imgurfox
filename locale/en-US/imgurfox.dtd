@@ -1,2 +1,7 @@
 <!ENTITY uploadImageCmd.label "Upload to Imgur">
 <!ENTITY uploadImageCmd.accesskey "U">
+
+<!ENTITY uploadImageChoiceCmd.label "Quick upload">
+<!ENTITY uploadImageChoiceCmd.accesskey "u">
+<!ENTITY editImageChoiceCmd.label "Upload and edit">
+<!ENTITY editImageChoiceCmd.accesskey "d">

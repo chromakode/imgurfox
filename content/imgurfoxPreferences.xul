@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE preferences SYSTEM "chrome://imgurfox/locale/preferences.dtd">
+<prefwindow id="imgurfoxPreferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" 
+            title="&prefwindow.title;">
+  <prefpane label="&general.title;">    
+      <preferences>
+        <preference id="prefDefaultContextAction" name="extensions.imgurfox@imgur.com.defaultContextAction" type="int"/>
+      </preferences>
+
+      <groupbox flex="1">
+        <caption label="&defaultContextAction.caption;"/>
+        <radiogroup id="uploadActionPrefs" preference="prefDefaultContextAction">
+          <radio label="&uploadAction.label;" accesskey="&uploadAction.accesskey;" value="1"/>
+          <radio label="&editAction.label;" accesskey="&editAction.accesskey;" value="2"/>
+          <radio label="&chooseAction.label;" accesskey="&chooseAction.accesskey;" value="0"/>
+        </radiogroup>
+      </groupbox>
+  </prefpane>
+</prefwindow>

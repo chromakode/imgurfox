@@ -10,6 +10,24 @@
               insertafter="context-saveimage"
               label="&uploadImageCmd.label;"
               accesskey="&uploadImageCmd.accesskey;"
-              oncommand="ImgurFoxWindow.contextUpload(event);"/>
+              oncommand="ImgurFoxWindow.contextUpload(event);"
+              visible="false"/>
+              
+    <menu id="context-imgur-choice"
+          class="menu-iconic"
+          insertafter="context-saveimage"
+          label="&uploadImageCmd.label;"
+          visible="false">
+      <menupopup>
+        <menuitem id="context-imgur-choice-upload"
+                  label="&uploadImageChoiceCmd.label;"
+                  accesskey="&uploadImageChoiceCmd.accesskey;"
+                  oncommand="ImgurFoxWindow.contextUpload(event, false);"/>
+        <menuitem id="context-imgur-choice-edit"
+                  label="&editImageChoiceCmd.label;"
+                  accesskey="&editImageChoiceCmd.accesskey;"
+                  oncommand="ImgurFoxWindow.contextUpload(event, true);"/>
+      </menupopup>
+    </menu>
   </popup>
 </overlay>

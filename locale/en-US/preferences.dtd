@@ -1,0 +1,10 @@
+<!ENTITY prefwindow.title "ImgurFox Preferences">
+
+<!ENTITY general.title "General">
+<!ENTITY defaultContextAction.caption "Default context menu action">
+<!ENTITY uploadAction.label "Quick upload">
+<!ENTITY uploadAction.accesskey "U">
+<!ENTITY editAction.label "Upload and edit">
+<!ENTITY editAction.accesskey "E">
+<!ENTITY chooseAction.label "Let me choose">
+<!ENTITY chooseAction.accesskey "c">
