@@ -10,3 +10,6 @@
     list-style-image: url("chrome://imgurfox/skin/picture_edit.png");
 }
 
+#context-imgur-screenshot {
+    list-style-image: url("chrome://imgurfox/skin/screenshot_page.png");
+}

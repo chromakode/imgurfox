@@ -2,32 +2,47 @@
 <?xml-stylesheet href="chrome://imgurfox/skin/imgurfox.css" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://imgurfox/locale/imgurfox.dtd">
 <overlay id="imgurfox-overlay"
-         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+         xmlns:html="http://www.w3.org/1999/xhtml">
   <script src="imgurfox.js" type="application/javascript;version=1.8"/>
   
-  <popup id="contentAreaContextMenu">
-    <menuitem id="context-imgur"
+  <window id="main-window">
+    <popupset id="mainPopupSet">
+      <popup id="contentAreaContextMenu">
+        <menuitem id="context-imgur"
+                  insertafter="context-saveimage"
+                  label="&uploadImageCmd.label;"
+                  accesskey="&uploadImageCmd.accesskey;"
+                  oncommand="ImgurFoxWindow.contextUpload(event);"
+                  visible="false"/>
+
+        <menuitem id="context-imgur-screenshot"
+                  insertafter="context-savepage"
+                  label="&uploadScreenshotCmd.label;"
+                  accesskey="&uploadScreenshotCmd.accesskey;"
+                  oncommand="ImgurFoxWindow.screenshotUpload(event);"/>
+
+        <menu id="context-imgur-choice"
+              class="menu-iconic"
               insertafter="context-saveimage"
               label="&uploadImageCmd.label;"
-              accesskey="&uploadImageCmd.accesskey;"
-              oncommand="ImgurFoxWindow.contextUpload(event);"
-              visible="false"/>
-              
-    <menu id="context-imgur-choice"
-          class="menu-iconic"
-          insertafter="context-saveimage"
-          label="&uploadImageCmd.label;"
-          visible="false">
-      <menupopup>
-        <menuitem id="context-imgur-choice-upload"
-                  label="&uploadImageChoiceCmd.label;"
-                  accesskey="&uploadImageChoiceCmd.accesskey;"
-                  oncommand="ImgurFoxWindow.contextUpload(event, false);"/>
-        <menuitem id="context-imgur-choice-edit"
-                  label="&editImageChoiceCmd.label;"
-                  accesskey="&editImageChoiceCmd.accesskey;"
-                  oncommand="ImgurFoxWindow.contextUpload(event, true);"/>
-      </menupopup>
-    </menu>
-  </popup>
+              visible="false">
+          <menupopup>
+            <menuitem id="context-imgur-choice-upload"
+                      label="&uploadImageChoiceCmd.label;"
+                      accesskey="&uploadImageChoiceCmd.accesskey;"
+                      oncommand="ImgurFoxWindow.contextUpload(event, false);"/>
+            <menuitem id="context-imgur-choice-edit"
+                      label="&editImageChoiceCmd.label;"
+                      accesskey="&editImageChoiceCmd.accesskey;"
+                      oncommand="ImgurFoxWindow.contextUpload(event, true);"/>
+          </menupopup>
+        </menu>
+      </popup>
+    </popupset>
+    
+    <html:canvas id="imgurfox-canvas"
+                 insertafter="browser-bottombox"
+                 style="display:none"/>
+  </window>
 </overlay>
