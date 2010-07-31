@@ -13,13 +13,13 @@
       <RDF:Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>3.0</em:minVersion>
-        <em:maxVersion>3.5.*</em:maxVersion>
+        <em:maxVersion>4.0.*</em:maxVersion>
       </RDF:Description>
     </em:targetApplication>
    
     <em:name>ImgurFox</em:name>
     <em:description>Uploads images to imgur.com.</em:description>
-    <em:creator>ImgurFox Team</em:creator>
+    <em:creator>Imgur</em:creator>
     <em:developer>Chromakode</em:developer>
     <em:developer>Koryk</em:developer>
     <em:iconURL>chrome://imgurfox/skin/imgurfox.png</em:iconURL>

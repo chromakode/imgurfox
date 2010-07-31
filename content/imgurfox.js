@@ -107,52 +107,15 @@ var ImgurFoxWindow = (function() {
     },
     
     screenshotUpload: function(event) {
-      // Many thanks to Brad Greenlee for his concise example:
-      // http://blog.footle.org/2007/07/31/binary-multipart-posts-in-javascript/
-      
       let dataURL = this.grabScreenshot();
       let base64data = dataURL.replace(/^([^,])*,/, "");
-      let binaryData = atob(base64data);
-
-      let timestamp = Date.now();
-      let separator = "----------multipart-boundary-" + timestamp;
-
-      let prefixStringInputStream = Components.classes["@mozilla.org/io/string-input-stream;1"].createInstance(Components.interfaces.nsIStringInputStream);
-      let formData =
-        "--" + separator + "\r\n" +
-	    "Content-Disposition: form-data; name=\"image\"; filename=\"image_" + timestamp + ".png" + "\"\r\n" +
-	    "Content-Type: image/png\r\n\r\n";
-      prefixStringInputStream.setData(formData, formData.length);
-
-      // write the image data via a binary output stream, to a storage stream
-      var binaryOutputStream = Components.classes["@mozilla.org/binaryoutputstream;1"].createInstance(Components.interfaces.nsIBinaryOutputStream);
-      var storageStream = Components.classes["@mozilla.org/storagestream;1"].createInstance(Components.interfaces.nsIStorageStream);
-      storageStream.init(4096, binaryData.length, null);
-      binaryOutputStream.setOutputStream(storageStream.getOutputStream(0));
-      binaryOutputStream.writeBytes(binaryData, binaryData.length);
-      binaryOutputStream.close();
-
-      // write out the rest of the form to another string input stream
-      var suffixStringInputStream = Components.classes["@mozilla.org/io/string-input-stream;1"].createInstance(Components.interfaces.nsIStringInputStream);
-      formData =
-        "\r\n--" + separator + "\r\n" +
-        "Content-Disposition: form-data; name=\"key\"\r\n\r\n" + IMGUR_API_KEY + "\r\n" +
-        "--" + separator + "--\r\n";
-      suffixStringInputStream.setData(formData, formData.length);
-
-      // multiplex the streams together
-      var multiStream = Components.classes["@mozilla.org/io/multiplex-input-stream;1"].createInstance(Components.interfaces.nsIMultiplexInputStream);
-      multiStream.appendStream(prefixStringInputStream);
-      multiStream.appendStream(storageStream.newInputStream(0));
-      multiStream.appendStream(suffixStringInputStream);
-    
+  
       let req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance();
       req.open("POST", uploadPOSTURL, true);
-      req.setRequestHeader("Content-type", "multipart/form-data; boundary=" + separator);
-      req.setRequestHeader("Content-length", multiStream.available());
+      req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       req.onreadystatechange = function (e) {
         if (req.readyState == 4) {
-          if(req.status == 200) {
+          if (req.status == 200) {
             data = nativeJSON.decode(req.responseText)
             if (data["rsp"]["stat"] == "ok") {
               openUILinkIn(data["rsp"]["image"]["imgur_page"], "tab");
@@ -168,8 +131,8 @@ var ImgurFoxWindow = (function() {
       req.onprogress = function onProgress(e) {  
         let percentComplete = (e.position / e.totalSize)*100;
         dump(percentComplete);
-      }  
-      req.send(multiStream);
+      }
+      req.send('image='+encodeURIComponent(base64data)+'&key='+encodeURIComponent(IMGUR_API_KEY));
     },
 
   }
