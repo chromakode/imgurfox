@@ -104,17 +104,11 @@ $.Jcrop = function(obj,opt)
 	// }}}
 	// Initialize some jQuery objects {{{
 
-	var $origimg = $(obj);
-	var $img = $origimg.clone().removeAttr('id').css({ position: 'absolute' });
+	var $origEl = $(obj);
+	presize($origEl,options.boxWidth,options.boxHeight);
 
-	$img.width($origimg.width());
-	$img.height($origimg.height());
-	$origimg.after($img).hide();
-
-	presize($img,options.boxWidth,options.boxHeight);
-
-	var boundx = $img.width(),
-		boundy = $img.height(),
+	var boundx = $origEl.width(),
+		boundy = $origEl.height(),
 
 		$div = $('<div />')
 			.width(boundx).height(boundy)
@@ -122,26 +116,12 @@ $.Jcrop = function(obj,opt)
 			.css({
 				position: 'relative',
 				backgroundColor: options.bgColor
-			}).insertAfter($origimg).append($img);
+			}).insertAfter($origEl);
 	;
 	
 	if (options.addClass) $div.addClass(options.addClass);
-	//$img.wrap($div);
+	//$origEl.wrap($div);
 
-	var $img2 = $('<img />')/*{{{*/
-			.attr('src',$img.attr('src'))
-			.css('position','absolute')
-			.width(boundx).height(boundy)
-	;/*}}}*/
-	var $img_holder = $('<div />')/*{{{*/
-		.width(pct(100)).height(pct(100))
-		.css({
-			zIndex: 310,
-			position: 'absolute',
-			overflow: 'hidden'
-		})
-		.append($img2)
-	;/*}}}*/
 	var $hdl_holder = $('<div />')/*{{{*/
 		.width(pct(100)).height(pct(100))
 		.css('zIndex',320);
@@ -151,9 +131,25 @@ $.Jcrop = function(obj,opt)
 			position: 'absolute',
 			zIndex: 300
 		})
-		.insertBefore($img)
-		.append($img_holder,$hdl_holder)
+		.insertBefore($origEl)
+		.append($hdl_holder)
 	;/*}}}*/
+	
+	// Create an 'H' shape of surrounding darkened divs
+	var dark = {},
+		$darks = $();
+	['top', 'bottom', 'left', 'right'].forEach(function(side) {
+		$darks.add(dark['$'+side] = $('<div />'));
+	});
+	
+	$darks
+		.css({
+			position: 'absolute',
+			opacity: options.bgOpacity,
+			background: options.bgColor,
+			zIndex: 250
+		})
+		.appendTo(document.body);
 
 	var bound = options.boundary;
 	var $trk = newTracker().width(boundx+(bound*2)).height(boundy+(bound*2))
@@ -165,7 +161,7 @@ $.Jcrop = function(obj,opt)
 
 	var xlimit, ylimit, xmin, ymin;
 	var xscale, yscale, enabled = true;
-	var docOffset = getPos($img),
+	var docOffset = getPos($origEl),
 		// Internal states
 		btndown, lastcurs, dimmed, animating,
 		shift_down;
@@ -287,33 +283,33 @@ $.Jcrop = function(obj,opt)
 
 			// Magic %-)
 			if(xx > x1) { // right side
-			  if(xx - x1 < min_x) {
-				xx = x1 + min_x;
-			  } else if (xx - x1 > max_x) {
-				xx = x1 + max_x;
-			  }
-			  if(yy > y1) {
-				yy = y1 + (xx - x1)/aspect;
-			  } else {
-				yy = y1 - (xx - x1)/aspect;
-			  }
+				if(xx - x1 < min_x) {
+					xx = x1 + min_x;
+				} else if (xx - x1 > max_x) {
+					xx = x1 + max_x;
+				}
+				if(yy > y1) {
+					yy = y1 + (xx - x1)/aspect;
+				} else {
+					yy = y1 - (xx - x1)/aspect;
+				}
 			} else if (xx < x1) { // left side
-			  if(x1 - xx < min_x) {
-				xx = x1 - min_x
-			  } else if (x1 - xx > max_x) {
-				xx = x1 - max_x;
-			  }
-			  if(yy > y1) {
-				yy = y1 + (x1 - xx)/aspect;
-			  } else {
-				yy = y1 - (x1 - xx)/aspect;
-			  }
+				if(x1 - xx < min_x) {
+					xx = x1 - min_x
+				} else if (x1 - xx > max_x) {
+					xx = x1 - max_x;
+				}
+				if(yy > y1) {
+					yy = y1 + (x1 - xx)/aspect;
+				} else {
+					yy = y1 - (x1 - xx)/aspect;
+				}
 			}
 
 			if(xx < 0) {
 				x1 -= xx;
 				xx = 0;
-			} else  if (xx > boundx) {
+			} else if (xx > boundx) {
 				x1 -= xx - boundx;
 				xx = boundx;
 			}
@@ -321,7 +317,7 @@ $.Jcrop = function(obj,opt)
 			if(yy < 0) {
 				y1 -= yy;
 				yy = 0;
-			} else  if (yy > boundy) {
+			} else if (yy > boundy) {
 				y1 -= yy - boundy;
 				yy = boundy;
 			}
@@ -446,7 +442,7 @@ $.Jcrop = function(obj,opt)
 			var jq = $('<div />')
 				.css({position: 'absolute', opacity: options.borderOpacity })
 				.addClass(cssClass(type));
-			$img_holder.append(jq);
+			$hdl_holder.append(jq);
 			return jq;
 		};
 		/*}}}*/
@@ -520,7 +516,6 @@ $.Jcrop = function(obj,opt)
 		/*}}}*/
 		function moveto(x,y)/*{{{*/
 		{
-			$img2.css({ top: px(-y), left: px(-x) });
 			$sel.css({ top: px(y), left: px(x) });
 		};
 		/*}}}*/
@@ -538,11 +533,21 @@ $.Jcrop = function(obj,opt)
 
 			updateVisible();
 		};
-		/*}}}*/
+		/*}}}*/awake
 
 		// Internal Methods
 		function updateVisible()/*{{{*/
 			{ if (awake) return update(); };
+		/*}}}*/
+		function updateDarks(c)/*{{{*/
+		{
+			var dw = $(document).width(),
+				dh = $(document).height();
+			dark.$top.css({ left: 0, top: 0, width: '100%', height: c.y });
+			dark.$bottom.css({ left: 0, top: c.y2, width: '100%', height: dh - c.y2 });
+			dark.$left.css({ left: 0, top: c.y2, width: c.x, height: dh - c.y2 });
+			dark.$right.css({ left: c.x2, top: c.y2, width: dw - c.x2, height: dh - c.y2 });
+		}
 		/*}}}*/
 		function update()/*{{{*/
 		{
@@ -554,6 +559,8 @@ $.Jcrop = function(obj,opt)
 			options.drawBorders &&
 				borders['right'].css({ left: px(c.w-1) }) &&
 					borders['bottom'].css({ top: px(c.h-1) });
+					
+			updateDarks(c);
 
 			seehandles && moveHandles(c);
 			awake || show();
@@ -564,7 +571,8 @@ $.Jcrop = function(obj,opt)
 		function show()/*{{{*/
 		{
 			$sel.show();
-			$img.css('opacity',options.bgOpacity);
+			$origEl.css('opacity',options.bgOpacity);
+			$darks.hide();
 			awake = true;
 		};
 		/*}}}*/
@@ -572,7 +580,8 @@ $.Jcrop = function(obj,opt)
 		{
 			disableHandles();
 			$sel.hide();
-			$img.css('opacity',1);
+			$origEl.css('opacity',1);
+			$darks.hide();
 			awake = false;
 		};
 		/*}}}*/
@@ -617,7 +626,7 @@ $.Jcrop = function(obj,opt)
 		var $track = newTracker().mousedown(createDragger('move'))
 				.css({ cursor: 'move', position: 'absolute', zIndex: 360 })
 
-		$img_holder.append($track);
+		$hdl_holder.append($track);
 		disableHandles();
 
 		return {
@@ -711,7 +720,7 @@ $.Jcrop = function(obj,opt)
 
 		function setCursor(t) { $trk.css('cursor',t); };
 
-		$img.before($trk);
+		$origEl.before($trk);
 		return {
 			activateHandlers: activateHandlers,
 			setCursor: setCursor
@@ -774,11 +783,11 @@ $.Jcrop = function(obj,opt)
 				case 9: return true;
 			}
 
-			return nothing(e);
+			return void(e);
 		};
 		/*}}}*/
 		
-		if (options.keySupport) $keywrap.insertBefore($img);
+		if (options.keySupport) $keywrap.insertBefore($origEl);
 		return {
 			watchKeys: watchKeys
 		};
@@ -815,7 +824,7 @@ $.Jcrop = function(obj,opt)
 	/*}}}*/
 	function startDragMode(mode,pos)/*{{{*/
 	{
-		docOffset = getPos($img);
+		docOffset = getPos($origEl);
 		Tracker.setCursor(mode=='move'?mode:mode+'-resize');
 
 		if (mode == 'move')
@@ -942,7 +951,7 @@ $.Jcrop = function(obj,opt)
 		if (options.disabled) return false;
 		if (!options.allowSelect) return false;
 		btndown = true;
-		docOffset = getPos($img);
+		docOffset = getPos($origEl);
 		Selection.disableHandles();
 		myCursor('crosshair');
 		var pos = mouseAbs(e);
@@ -1089,7 +1098,6 @@ $.Jcrop = function(obj,opt)
 	function destroy()//{{{
 	{
 		$div.remove();
-		$origimg.show();
 	};
 	//}}}
 
@@ -1122,12 +1130,6 @@ $.Jcrop = function(obj,opt)
 		xmin = options.minSize[0] || 0;
 		ymin = options.minSize[1] || 0;
 
-		if ('outerImage' in options)
-		{
-			$img.attr('src',options.outerImage);
-			delete(options.outerImage);
-		}
-
 		Selection.refresh();
 	};
 	//}}}
@@ -1158,7 +1160,7 @@ $.Jcrop = function(obj,opt)
 
 	};
 
-	$origimg.data('Jcrop',api);
+	$origEl.data('Jcrop',api);
 	return api;
 };
 
@@ -1195,3 +1197,5 @@ $.fn.Jcrop = function(options)/*{{{*/
 /*}}}*/
 
 })(jQuery);
+
+HELLO = 1

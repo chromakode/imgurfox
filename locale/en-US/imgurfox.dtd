@@ -4,6 +4,9 @@
 <!ENTITY uploadScreenshotCmd.label "Screenshot on Imgur">
 <!ENTITY uploadScreenshotCmd.accesskey "h">
 
+<!ENTITY uploadSelectiveScreenshotCmd.label "Selective Screenshot on Imgur">
+<!ENTITY uploadSelectiveScreenshotCmd.accesskey "j">
+
 <!ENTITY uploadImageChoiceCmd.label "Quick upload">
 <!ENTITY uploadImageChoiceCmd.accesskey "u">
 <!ENTITY editImageChoiceCmd.label "Upload and edit">

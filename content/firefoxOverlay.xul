@@ -20,7 +20,19 @@
                   insertafter="context-savepage"
                   label="&uploadScreenshotCmd.label;"
                   accesskey="&uploadScreenshotCmd.accesskey;"
-                  oncommand="ImgurFoxWindow.screenshotUpload(event);"/>
+                  oncommand="ImgurFoxWindow.uploadScreenshot(event);"/>
+
+        <menuitem id="context-imgur-selective-screenshot"
+                  insertafter="context-savepage"
+                  label="&uploadSelectiveScreenshotCmd.label;"
+                  accesskey="&uploadSelectiveScreenshotCmd.accesskey;"
+                  oncommand="ImgurFoxWindow.uploadSelectiveScreenshot(event);"/>
+
+        <menuitem id="context-imgur-screenshot"
+                  insertafter="context-savepage"
+                  label="&uploadScreenshotCmd.label;"
+                  accesskey="&uploadScreenshotCmd.accesskey;"
+                  oncommand="ImgurFoxWindow.uploadImage(event);"/>
 
         <menu id="context-imgur-choice"
               class="menu-iconic"

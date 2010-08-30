@@ -1,5 +1,5 @@
 content   imgurfox                              content/
-resource  imgurfox                              modules/
+content   imgurfox-crop                         content/crop/ contentaccessible=yes
 locale    imgurfox             en-US            locale/en-US/
 skin      imgurfox             classic/1.0      skin/
 overlay   chrome://browser/content/browser.xul   chrome://imgurfox/content/firefoxOverlay.xul
