@@ -1,7 +1,8 @@
 /**
- * jquery.Jcrop.js v0.9.8
+ * jquery.Jcrop.js v0.9.8-imgurfox
  * jQuery Image Cropping Plugin
  * @author Kelly Hallman <khallman@gmail.com>
+ * Modified by Chromakode <c@chromakode.com> for imgurfox
  * Copyright (c) 2008-2009 Kelly Hallman - released under MIT License {{{
  *
  * Permission is hereby granted, free of charge, to any person
@@ -95,7 +96,8 @@ $.Jcrop = function(obj,opt)
 
 		// Callbacks / Event Handlers
 		onChange: function() { },
-		onSelect: function() { }
+		onSelect: function() { },
+		onDblClick: function() { }
 
 	};
 	var options = defaults;
@@ -107,16 +109,17 @@ $.Jcrop = function(obj,opt)
 	var $origEl = $(obj);
 	presize($origEl,options.boxWidth,options.boxHeight);
 
-	var boundx = $origEl.width(),
-		boundy = $origEl.height(),
+	var size = {x: $origEl.width(), y: $origEl.height()},
+		offset = $origEl.offset(),
 
 		$div = $('<div />')
-			.width(boundx).height(boundy)
+			.width(size.x).height(size.y)
 			.addClass(cssClass('holder'))
 			.css({
-				position: 'relative',
-				backgroundColor: options.bgColor
-			}).insertAfter($origEl);
+				position: 'absolute',
+				left: offset.left,
+				top: offset.top
+			}).appendTo(document.body)
 	;
 	
 	if (options.addClass) $div.addClass(options.addClass);
@@ -131,7 +134,7 @@ $.Jcrop = function(obj,opt)
 			position: 'absolute',
 			zIndex: 300
 		})
-		.insertBefore($origEl)
+		.appendTo($div)
 		.append($hdl_holder)
 	;/*}}}*/
 	
@@ -139,20 +142,19 @@ $.Jcrop = function(obj,opt)
 	var dark = {},
 		$darks = $();
 	['top', 'bottom', 'left', 'right'].forEach(function(side) {
-		$darks.add(dark['$'+side] = $('<div />'));
+		dark['$'+side] = $('<div />');
+		$darks = $darks.add(dark['$'+side]);
 	});
 	
-	$darks
-		.css({
-			position: 'absolute',
-			opacity: options.bgOpacity,
-			background: options.bgColor,
-			zIndex: 250
-		})
-		.appendTo(document.body);
+	$darks.css({
+		position: 'absolute',
+		opacity: options.bgOpacity,
+		background: options.bgColor,
+		zIndex: 250
+	}).appendTo($div);
 
 	var bound = options.boundary;
-	var $trk = newTracker().width(boundx+(bound*2)).height(boundy+(bound*2))
+	var $trk = newTracker().width(size.x+(bound*2)).height(size.y+(bound*2))
 		.css({ position: 'absolute', top: px(-bound), left: px(-bound), zIndex: 290 })
 		.mousedown(newSelection);	
 	
@@ -204,8 +206,8 @@ $.Jcrop = function(obj,opt)
 			if (0 > x1 + ox) ox -= ox + x1;
 			if (0 > y1 + oy) oy -= oy + y1;
 
-			if (boundy < y2 + oy) oy += boundy - (y2 + oy);
-			if (boundx < x2 + ox) ox += boundx - (x2 + ox);
+			if (size.y < y2 + oy) oy += size.y - (y2 + oy);
+			if (size.x < x2 + ox) ox += size.x - (x2 + ox);
 
 			x1 += ox;
 			x2 += ox;
@@ -241,8 +243,8 @@ $.Jcrop = function(obj,opt)
 				real_ratio = rwa / rha,
 				xx, yy
 			;
-			if (max_x == 0) { max_x = boundx * 10 }
-			if (max_y == 0) { max_y = boundy * 10 }
+			if (max_x == 0) { max_x = size.x * 10 }
+			if (max_y == 0) { max_y = size.y * 10 }
 			if (real_ratio < aspect)
 			{
 				yy = y2;
@@ -255,9 +257,9 @@ $.Jcrop = function(obj,opt)
 					h = Math.abs((xx - x1) / aspect);
 					yy = rh < 0 ? y1 - h: h + y1;
 				}
-				else if (xx > boundx)
+				else if (xx > size.x)
 				{
-					xx = boundx;
+					xx = size.x;
 					h = Math.abs((xx - x1) / aspect);
 					yy = rh < 0 ? y1 - h : h + y1;
 				}
@@ -273,9 +275,9 @@ $.Jcrop = function(obj,opt)
 					w = Math.abs((yy - y1) * aspect);
 					xx = rw < 0 ? x1 - w : w + x1;
 				}
-				else if (yy > boundy)
+				else if (yy > size.y)
 				{
-					yy = boundy;
+					yy = size.y;
 					w = Math.abs(yy - y1) * aspect;
 					xx = rw < 0 ? x1 - w : w + x1;
 				}
@@ -309,17 +311,17 @@ $.Jcrop = function(obj,opt)
 			if(xx < 0) {
 				x1 -= xx;
 				xx = 0;
-			} else if (xx > boundx) {
-				x1 -= xx - boundx;
-				xx = boundx;
+			} else if (xx > size.x) {
+				x1 -= xx - size.x;
+				xx = size.x;
 			}
 
 			if(yy < 0) {
 				y1 -= yy;
 				yy = 0;
-			} else if (yy > boundy) {
-				y1 -= yy - boundy;
-				yy = boundy;
+			} else if (yy > size.y) {
+				y1 -= yy - size.y;
+				yy = size.y;
 			}
 
 			return last = makeObj(flipCoords(x1,y1,xx,yy));
@@ -330,8 +332,8 @@ $.Jcrop = function(obj,opt)
 			if (p[0] < 0) p[0] = 0;
 			if (p[1] < 0) p[1] = 0;
 
-			if (p[0] > boundx) p[0] = boundx;
-			if (p[1] > boundy) p[1] = boundy;
+			if (p[0] > size.x) p[0] = size.x;
+			if (p[1] > size.y) p[1] = size.y;
 
 			return [ p[0], p[1] ];
 		};
@@ -371,10 +373,10 @@ $.Jcrop = function(obj,opt)
 			if (y1 < 0) { y2 -= y1; y1 -= y1; }
 			if (x2 < 0) { x1 -= x2; x2 -= x2; }
 			if (y2 < 0) { y1 -= y2; y2 -= y2; }
-			if (x2 > boundx) { var delta = x2 - boundx; x1 -= delta; x2 -= delta; }
-			if (y2 > boundy) { var delta = y2 - boundy; y1 -= delta; y2 -= delta; }
-			if (x1 > boundx) { var delta = x1 - boundy; y2 -= delta; y1 -= delta; }
-			if (y1 > boundy) { var delta = y1 - boundy; y2 -= delta; y1 -= delta; }
+			if (x2 > size.x) { var delta = x2 - size.x; x1 -= delta; x2 -= delta; }
+			if (y2 > size.y) { var delta = y2 - size.y; y1 -= delta; y2 -= delta; }
+			if (x1 > size.x) { var delta = x1 - size.y; y2 -= delta; y1 -= delta; }
+			if (y1 > size.y) { var delta = y1 - size.y; y2 -= delta; y1 -= delta; }
 
 			return makeObj(flipCoords(x1,y1,x2,y2));
 		};
@@ -541,12 +543,10 @@ $.Jcrop = function(obj,opt)
 		/*}}}*/
 		function updateDarks(c)/*{{{*/
 		{
-			var dw = $(document).width(),
-				dh = $(document).height();
-			dark.$top.css({ left: 0, top: 0, width: '100%', height: c.y });
-			dark.$bottom.css({ left: 0, top: c.y2, width: '100%', height: dh - c.y2 });
-			dark.$left.css({ left: 0, top: c.y2, width: c.x, height: dh - c.y2 });
-			dark.$right.css({ left: c.x2, top: c.y2, width: dw - c.x2, height: dh - c.y2 });
+			dark.$top.css({ left: offset.left, top: offset.top, width: size.x, height: c.y });
+			dark.$bottom.css({ left: offset.left, top: c.y2, width: size.x, height: size.y - c.y2 });
+			dark.$left.css({ left: 0, top: c.y, width: c.x - offset.left, height: c.h });
+			dark.$right.css({ left: c.x2, top: c.y, width: size.x + offset.left - c.x2, height: c.h });
 		}
 		/*}}}*/
 		function update()/*{{{*/
@@ -572,7 +572,7 @@ $.Jcrop = function(obj,opt)
 		{
 			$sel.show();
 			$origEl.css('opacity',options.bgOpacity);
-			$darks.hide();
+			$darks.show();
 			awake = true;
 		};
 		/*}}}*/
@@ -648,7 +648,8 @@ $.Jcrop = function(obj,opt)
 	{
 		var onMove		= function() { },
 			onDone		= function() { },
-			trackDoc	= options.trackDocument;
+			trackDoc	= options.trackDocument,
+			lastClick = null;
 
 		if (!trackDoc)
 		{
@@ -696,9 +697,14 @@ $.Jcrop = function(obj,opt)
 			if (btndown)
 			{
 				btndown = false;
-
+        var now = new Date();
+        
 				onDone(mouseAbs(e));
-				options.onSelect(unscale(Coords.getFixed()));
+ 				options.onSelect(unscale(Coords.getFixed()));
+				if (lastClick && now - lastClick < 200) {
+  				options.onDblClick(unscale(Coords.getFixed()));
+  		  }
+		    lastClick = now;
 				toBack();
 				onMove = function() { };
 				onDone = function() { };
@@ -706,7 +712,6 @@ $.Jcrop = function(obj,opt)
 
 			return false;
 		};
-		/*}}}*/
 
 		function activateHandlers(move,done)/* {{{ */
 		{
@@ -720,7 +725,7 @@ $.Jcrop = function(obj,opt)
 
 		function setCursor(t) { $trk.css('cursor',t); };
 
-		$origEl.before($trk);
+		$trk.appendTo($div);
 		return {
 			activateHandlers: activateHandlers,
 			setCursor: setCursor
@@ -787,7 +792,7 @@ $.Jcrop = function(obj,opt)
 		};
 		/*}}}*/
 		
-		if (options.keySupport) $keywrap.insertBefore($origEl);
+		if (options.keySupport) $keywrap.appendTo($div);
 		return {
 			watchKeys: watchKeys
 		};
@@ -1112,7 +1117,7 @@ $.Jcrop = function(obj,opt)
 		Tracker.setCursor( options.allowSelect? 'crosshair': 'default' );
 		Selection.setCursor( options.allowMove? 'move': 'default' );
 
-		$div.css('backgroundColor',options.bgColor);
+		$darks.css('backgroundColor',options.bgColor);
 
 		if ('setSelect' in options) {
 			setSelect(opt.setSelect);
@@ -1121,8 +1126,8 @@ $.Jcrop = function(obj,opt)
 		}
 
 		if ('trueSize' in options) {
-			xscale = options.trueSize[0] / boundx;
-			yscale = options.trueSize[1] / boundy;
+			xscale = options.trueSize[0] / size.x;
+			yscale = options.trueSize[1] / size.y;
 		}
 
 		xlimit = options.maxSize[0] || 0;
@@ -1152,8 +1157,8 @@ $.Jcrop = function(obj,opt)
 
 		focus: KeyManager.watchKeys,
 
-		getBounds: function() { return [ boundx * xscale, boundy * yscale ]; },
-		getWidgetSize: function() { return [ boundx, boundy ]; },
+		getBounds: function() { return [ size.x * xscale, size.y * yscale ]; },
+		getWidgetSize: function() { return [ size.x, size.y ]; },
 
 		release: Selection.release,
 		destroy: destroy
@@ -1197,5 +1202,3 @@ $.fn.Jcrop = function(options)/*{{{*/
 /*}}}*/
 
 })(jQuery);
-
-HELLO = 1

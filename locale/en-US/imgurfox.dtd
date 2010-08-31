@@ -1,13 +1,16 @@
-<!ENTITY uploadImageCmd.label "Upload to Imgur">
-<!ENTITY uploadImageCmd.accesskey "U">
+<!ENTITY uploadScreenshotCmd.label "Upload Screenshot">
+<!ENTITY uploadScreenshotCmd.accesskey "o">
 
-<!ENTITY uploadScreenshotCmd.label "Screenshot on Imgur">
-<!ENTITY uploadScreenshotCmd.accesskey "h">
+<!ENTITY uploadSelectiveScreenshotCmd.label "Upload Selective Screenshot">
+<!ENTITY uploadSelectiveScreenshotCmd.accesskey "t">
 
-<!ENTITY uploadSelectiveScreenshotCmd.label "Selective Screenshot on Imgur">
-<!ENTITY uploadSelectiveScreenshotCmd.accesskey "j">
+<!ENTITY uploadFromClipboardCmd.label "Upload From Clipboard">
+<!ENTITY uploadFromClipboardCmd.accesskey "l">
 
-<!ENTITY uploadImageChoiceCmd.label "Quick upload">
-<!ENTITY uploadImageChoiceCmd.accesskey "u">
-<!ENTITY editImageChoiceCmd.label "Upload and edit">
-<!ENTITY editImageChoiceCmd.accesskey "d">
+
+
+<!ENTITY uploadQuickImageCmd.label "Quick Upload">
+<!ENTITY uploadQuickImageCmd.accesskey "Q">
+
+<!ENTITY uploadEditImageCmd.label "Upload + Edit">
+<!ENTITY uploadEditImageCmd.accesskey "E">

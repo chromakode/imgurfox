@@ -9,45 +9,46 @@
   <window id="main-window">
     <popupset id="mainPopupSet">
       <popup id="contentAreaContextMenu">
-        <menuitem id="context-imgur"
-                  insertafter="context-saveimage"
-                  label="&uploadImageCmd.label;"
-                  accesskey="&uploadImageCmd.accesskey;"
-                  oncommand="ImgurFoxWindow.contextUpload(event);"
-                  visible="false"/>
-
-        <menuitem id="context-imgur-screenshot"
-                  insertafter="context-savepage"
-                  label="&uploadScreenshotCmd.label;"
-                  accesskey="&uploadScreenshotCmd.accesskey;"
-                  oncommand="ImgurFoxWindow.uploadScreenshot(event);"/>
-
-        <menuitem id="context-imgur-selective-screenshot"
-                  insertafter="context-savepage"
-                  label="&uploadSelectiveScreenshotCmd.label;"
-                  accesskey="&uploadSelectiveScreenshotCmd.accesskey;"
-                  oncommand="ImgurFoxWindow.uploadSelectiveScreenshot(event);"/>
-
-        <menuitem id="context-imgur-screenshot"
-                  insertafter="context-savepage"
-                  label="&uploadScreenshotCmd.label;"
-                  accesskey="&uploadScreenshotCmd.accesskey;"
-                  oncommand="ImgurFoxWindow.uploadImage(event);"/>
-
-        <menu id="context-imgur-choice"
+      
+        <menu id="context-imgur"
               class="menu-iconic"
-              insertafter="context-saveimage"
-              label="&uploadImageCmd.label;"
-              visible="false">
+              insertafter="context-savepage"
+              label="Imgur">
           <menupopup>
-            <menuitem id="context-imgur-choice-upload"
-                      label="&uploadImageChoiceCmd.label;"
-                      accesskey="&uploadImageChoiceCmd.accesskey;"
-                      oncommand="ImgurFoxWindow.contextUpload(event, false);"/>
-            <menuitem id="context-imgur-choice-edit"
-                      label="&editImageChoiceCmd.label;"
-                      accesskey="&editImageChoiceCmd.accesskey;"
-                      oncommand="ImgurFoxWindow.contextUpload(event, true);"/>
+          
+            <!-- General commands -->
+
+            <menuitem id="context-imgur-screenshot"
+                      label="&uploadScreenshotCmd.label;"
+                      accesskey="&uploadScreenshotCmd.accesskey;"
+                      oncommand="ImgurFoxWindow.uploadScreenshot(event);"/>
+
+            <menuitem id="context-imgur-selective-screenshot"
+                      label="&uploadSelectiveScreenshotCmd.label;"
+                      accesskey="&uploadSelectiveScreenshotCmd.accesskey;"
+                      oncommand="ImgurFoxWindow.uploadSelectiveScreenshot(event);"/>
+                      
+            <menuitem id="context-imgur-from-clipboard"
+                      label="&uploadFromClipboardCmd.label;"
+                      accesskey="&uploadFromClipboardCmd.accesskey;"
+                      oncommand="ImgurFoxWindow.notyet;"/>
+                      
+            <!-- Image commands -->
+                      
+            <menuitem id="context-imgur-upload-quick"
+                      class="imgur-image-command"
+                      label="&uploadQuickImageCmd.label;"
+                      accesskey="&uploadQuickImageCmd.accesskey;"
+                      oncommand="ImgurFoxWindow.uploadImage(event, false);"
+                      hidden="true"/>
+                      
+            <menuitem id="context-imgur-upload-edit"
+                      class="imgur-image-command"
+                      label="&uploadEditImageCmd.label;"
+                      accesskey="&uploadEditImageCmd.accesskey;"
+                      oncommand="ImgurFoxWindow.uploadImage(event, true);"
+                      hidden="true"/>
+                      
           </menupopup>
         </menu>
       </popup>

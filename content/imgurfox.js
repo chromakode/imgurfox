@@ -23,36 +23,13 @@ var ImgurFoxWindow = (function() {
     onLoad: function() {
       let contextMenu = document.getElementById("contentAreaContextMenu");
       contextMenu.addEventListener("popupshowing", function(event) {
-        let uploadMenuItem = document.getElementById("context-imgur");
-        let uploadMenuChoice = document.getElementById("context-imgur-choice");
+          let imageURI = ImgurFoxWindow.contextImageURI,
+              showMenuItem = imageURI && imageURI.scheme == "http";
+              imageMenuItems = document.getElementsByClassName("imgur-image-command");
         
-        let showMenuItem;
-        let imageURI = ImgurFoxWindow.contextImageURI;
-        if (imageURI) {
-          // TODO: Can imgur take https or ftp URL schemes?
-          showMenuItem = imageURI.scheme == "http";
-        } else {
-          showMenuItem = false;
-        }
-        
-        if (showMenuItem) {
-          let contextAction = preferences.getCharPref("defaultContextAction");
-          let isChoice = contextAction == CONTEXT_CHOICE;
-          
-          uploadMenuItem.hidden = isChoice;
-          uploadMenuChoice.hidden = !isChoice;
-          
-          if (!isChoice) {
-            if (contextAction == CONTEXT_UPLOAD) {
-                uploadMenuItem.label = stringBundle.GetStringFromName("uploadImageCmd.label");
-            } else {
-                uploadMenuItem.label = stringBundle.GetStringFromName("editImageCmd.label");
-            }
-          }
-        } else {
-          uploadMenuItem.hidden = true;
-          uploadMenuChoice.hidden = true;
-        }
+        Array.prototype.forEach.call(imageMenuItems, function(menuitem) {
+          menuitem.hidden = !showMenuItem;
+        });
       }, false)
     },
     
@@ -74,77 +51,139 @@ var ImgurFoxWindow = (function() {
     },
     
     uploadImage: function(event, edit) {
-      if (edit == null) {
-        edit = preferences.getCharPref("defaultContextAction") == CONTEXT_EDIT;
-      }
-      let actionURL = edit ? editURL : uploadURL;
-      Imgur.transload(ImgurFoxWindow.contextImageURI.spec);
+      Imgur.transload(ImgurFoxWindow.contextImageURI.spec, edit);
     },
     
     uploadScreenshot: function(event) {
-        Imgur.upload(dataFromURI(this.grabScreenshot()));
+      Imgur.upload(utils.dataFromURI(this.grabScreenshot()));
     },
     
     uploadSelectiveScreenshot: function(event) {
-      this.grabSelectiveScreenshot();
+      this.grabSelectiveScreenshot(function(screenshotData) {
+        Imgur.upload(utils.dataFromURI(screenshotData));
+      });
     },
     
     /* Browser screenshot helpers */
     
-    grabScreenshot: function(fullPage) {
+    grabScreenshot: function(rect, fullPage) {
       let canvas = document.getElementById("imgurfox-canvas");
       let win = gBrowser.contentWindow;
       
-      let x, y, w, h;
-      if (fullPage) {
-        x = 0;
-        y = 0;
-        w = win.document.documentElement.clientWidth;
-        h = win.document.documentElement.scrollHeight;
-      } else {
-        x = win.scrollX;
-        y = win.scrollY;
-        w = win.document.documentElement.width;
-        h = win.innerHeight;
+      if (!rect) {
+        rect = {};
+        if (fullPage) {
+          rect.x = 0;
+          rect.y = 0;
+          rect.w = win.document.documentElement.clientWidth;
+          rect.h = win.document.documentElement.scrollHeight;
+        } else {
+          rect.x = win.scrollX;
+          rect.y = win.scrollY;
+          rect.w = win.innerWidth;
+          rect.h = win.innerHeight;
+        }
       }
       
-      canvas.width = w;
-      canvas.height = h;
+      canvas.width = rect.w;
+      canvas.height = rect.h;
       
       let ctx = canvas.getContext("2d");
-      ctx.clearRect(0, 0, w, h);
-      ctx.drawWindow(win, x, y, w, h, "rgb(255,255,255)");
+      ctx.clearRect(0, 0, rect.w, rect.h);
+      ctx.drawWindow(win, rect.x, rect.y, rect.w, rect.h, "rgb(255,255,255)");
       return canvas.toDataURL();
     },
     
-    grabSelectiveScreenshot: function() {
-      let screenshot = this.grabScreenshot(true);
-      
-      // Make an iframe on top of the page content.
-      let pageDocument = gBrowser.contentDocument,
-          pageDocumentHeight = pageDocument.documentElement.scrollHeight;
-      let iframe = pageDocument.createElement("iframe");
-      iframe.setAttribute("style", "position:absolute; top:0; left:0; width:100%; height:"+pageDocumentHeight+"px; border:none; background:none; overflow:hidden; z-index:999999;");
-      pageDocument.body.appendChild(iframe);
-      
-      // Woot, let"s start piling scripts and css into it.
-      iframe.addEventListener("load", function(event) {
-        let iframeDocument = iframe.contentDocument;
+    grabSelectiveScreenshot: function(callback) {
+      var notificationValue = "imgurfox-selective-screenshot";
+    
+      function initBar(iframe) {
+        let notificationBox = gBrowser.getNotificationBox();
+        return notificationBox.appendNotification(
+          stringBundle.GetStringFromName("selectiveScreenshot.message"),
+          notificationValue, 
+          "chrome://imgurfox/skin/upload_small.png",
+          notificationBox.PRIORITY_INFO_HIGH,
+          [{label:"Cancel", accessKey:"C", callback:function() { endCrop(iframe); }},
+           {label:"Upload", accessKey:"U", callback:function() { performCrop(iframe); }}]);
+      }
+    
+      function initCrop() {
+        // Make an iframe on top of the page content.
+        let pageDocument = gBrowser.contentDocument,
+            pageDocumentHeight = pageDocument.documentElement.scrollHeight;
+        let iframe = pageDocument.createElement("iframe");
+        iframe.setAttribute("style", "position:absolute; top:0; left:0; width:100%; height:"+pageDocumentHeight+"px; border:none; background:none; overflow:hidden; z-index:999999;");
+        pageDocument.body.appendChild(iframe);
         
-        iframeDocument.body.setAttribute("style", "margin:0;");
+        // Woot, let"s start piling scripts and css into it.
+        iframe.addEventListener("load", function(event) {
+          let iframeDocument = iframe.contentDocument;
+          iframeDocument.body.setAttribute("style", "margin:0; width:100%; height:100%;");
+          
+          utils.addCSS(iframeDocument, "chrome://imgurfox-crop/content/jquery.Jcrop.css");
+          utils.addScripts(iframeDocument,
+            ["chrome://imgurfox-crop/content/jquery-1.4.2.min.js",
+             "chrome://imgurfox-crop/content/jquery.Jcrop.js"],
+            function afterLoaded() {
+              // Run this code within the iframe.
+              iframe.contentWindow.location.href = "javascript:(" + function() {
+                function saveCoords(c) {
+                  window.cropCoords = JSON.stringify(c);
+                }
+              
+                var dde = window.top.document.documentElement,
+                    crop = $.Jcrop(document.body, {
+                      boundary: 0,
+                      onChange: saveCoords,
+                      onDblClick: function(c) {
+                        saveCoords(c);
+                        var event = document.createEvent("Events");
+                        event.initEvent("CropFinished", true, false);
+                        document.body.dispatchEvent(event);
+                      }
+                    });
+                    
+                $(".jcrop-holder").hide();
+                
+                crop.setSelect([
+                  dde.scrollLeft + 50,
+                  dde.scrollTop + 50,
+                  dde.scrollLeft + dde.clientWidth - 50,
+                  dde.scrollTop + dde.clientHeight - 50]);
+                  
+                crop.focus();
+                crop.enable();
+                $(".jcrop-holder").fadeIn();
+                return;
+              } + ")();";
+            }
+          );
+        }, false);
         
-        utils.addScript(iframeDocument, "chrome://imgurfox-crop/content/jquery-1.4.2.min.js")
-        utils.addScript(iframeDocument, "chrome://imgurfox-crop/content/jquery.Jcrop.js");
-        utils.addCSS(iframeDocument, "chrome://imgurfox-crop/content/jquery.Jcrop.css");
-
-        let imgScreenshot = iframeDocument.createElement("img");
-        imgScreenshot.setAttribute("id", "screenshot");
-        imgScreenshot.setAttribute("src", screenshot);
-        iframeDocument.body.appendChild(imgScreenshot);
-
-        //let scrollTop = iframeDocument.documentElement.scrollTop;
-        iframe.contentWindow.location = "javascript:(function() { var dde = window.top.document.documentElement, crop = $.Jcrop('#screenshot', {boundary:0}); $('.jcrop-holder').hide(); crop.setSelect([dde.scrollLeft + 10, dde.scrollTop + 10, dde.scrollLeft + dde.clientWidth - 10, dde.scrollTop + dde.clientHeight - 10]); crop.focus(); crop.enable(); $('.jcrop-holder').fadeIn(); return; }());";
-        //iframeDocument.documentElement.scrollTop = scrollTop;
+        return iframe;
+      }
+      
+      function endCrop(iframe) {
+        iframe.parentNode.removeChild(iframe);
+        
+        var notification = gBrowser.getNotificationBox().getNotificationWithValue(notificationValue);
+        if (notification) { notification.close(); }
+      }
+      
+      function performCrop(iframe) {
+        let cropCoords = nativeJSON.decode(iframe.contentWindow.wrappedJSObject.cropCoords);
+        endCrop(iframe);
+        let screenshotData = ImgurFoxWindow.grabScreenshot(cropCoords);
+        callback(screenshotData);
+      }
+      
+      let iframe = initCrop();
+      iframe.contentWindow.addEventListener("CropFinished", function() { performCrop(iframe) }, false);
+      initBar(iframe).addEventListener("click", function(event) {
+        if (/messageCloseButton/.test(event.originalTarget.getAttribute("class"))) {
+          endCrop(iframe);
+        }
       }, false);
     },
   }
@@ -159,13 +198,14 @@ var ImgurFoxWindow = (function() {
     upload: function(base64data) {
       let req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance();
       req.open("POST", "http://imgur.com/api/upload.json", true);
+      let imageTab = gBrowser.loadOneTab("http://imgur.com/working/", null, null, null, false);
       req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
       req.onreadystatechange = function (e) {
         if (req.readyState == 4) {
           if (req.status == 200) {
             data = nativeJSON.decode(req.responseText)
             if (data["rsp"]["stat"] == "ok") {
-              openUILinkIn(data["rsp"]["image"]["imgur_page"], "tab");
+              gBrowser.getBrowserForTab(imageTab).loadURI(data["rsp"]["image"]["imgur_page"]);
             } else {
               dump("Imgur error: " + data["rsp"]["error_code"]);
               // FIXME
@@ -175,10 +215,6 @@ var ImgurFoxWindow = (function() {
           }
         }
       };
-      req.onprogress = function onProgress(e) {  
-        let percentComplete = (e.position / e.totalSize)*100;
-        dump(percentComplete);
-      }
       req.send("image="+encodeURIComponent(base64data)+"&key="+encodeURIComponent(this.api_key));
     },
   }
@@ -190,11 +226,22 @@ var ImgurFoxWindow = (function() {
       });
     },
     
-    addScript: function(doc, src) { 
+    addScript: function(doc, src, callback) { 
       let el = doc.createElement("script");
       this.setAttributes(el, [["type", "text/javascript"], ["src", src]]);
+      if (callback) { el.addEventListener("load", callback, false); }
       doc.getElementsByTagName("head")[0].appendChild(el);
       return el;
+    },
+    
+    addScripts: function(doc, scripts, callback) {
+      if (scripts.length > 0) {
+        this.addScript(doc, scripts.shift(), function() {
+          utils.addScripts(doc, scripts, callback);
+        });
+      } else {
+        if (callback) { callback(); }
+      }
     },
     
     addCSS: function(doc, src) {

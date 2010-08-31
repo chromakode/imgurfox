@@ -1,12 +1,12 @@
-#context-imgur, #context-imgur-choice {
+#context-imgur {
     list-style-image: url("chrome://imgurfox/skin/upload_small.png");
 }
 
-#context-imgur-choice-upload {
+#context-imgur-upload-quick {
     list-style-image: url("chrome://imgurfox/skin/picture_go.png");
 }
 
-#context-imgur-choice-edit {
+#context-imgur-upload-edit {
     list-style-image: url("chrome://imgurfox/skin/picture_edit.png");
 }
 
