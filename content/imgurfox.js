@@ -111,8 +111,16 @@ var ImgurFoxWindow = (function() {
       function initCrop() {
         // Make an iframe on top of the page content.
         let pageDocument = gBrowser.contentDocument,
-            pageDocumentHeight = pageDocument.documentElement.scrollHeight;
+            pageDocumentHeight = pageDocument.documentElement.scrollHeight,
+            overlayId = "_imgurfox-crop-overlay";
+        
+        if (pageDocument.getElementById(overlayId)) {
+          // Already cropping the page.
+          return;
+        }
+        
         let iframe = pageDocument.createElement("iframe");
+        iframe.setAttribute("id", overlayId);
         iframe.setAttribute("style", "position:absolute; top:0; left:0; width:100%; height:"+pageDocumentHeight+"px; border:none; background:none; overflow:hidden; z-index:999999;");
         pageDocument.body.appendChild(iframe);
         
@@ -179,12 +187,14 @@ var ImgurFoxWindow = (function() {
       }
       
       let iframe = initCrop();
-      iframe.contentWindow.addEventListener("CropFinished", function() { performCrop(iframe) }, false);
-      initBar(iframe).addEventListener("click", function(event) {
-        if (/messageCloseButton/.test(event.originalTarget.getAttribute("class"))) {
-          endCrop(iframe);
-        }
-      }, false);
+      if (iframe) {
+        iframe.contentWindow.addEventListener("CropFinished", function() { performCrop(iframe) }, false);
+        initBar(iframe).addEventListener("click", function(event) {
+          if (/messageCloseButton/.test(event.originalTarget.getAttribute("class"))) {
+            endCrop(iframe);
+          }
+        }, false);
+      }
     },
   }
   
