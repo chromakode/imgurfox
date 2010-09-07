@@ -665,7 +665,7 @@ $.Jcrop = function(obj,opt)
 			$trk.css({zIndex:450});
 			if (trackDoc)
 			{
-				$(document)
+				$(document).add(window.top.document)
 					.mousemove(trackMove)
 					.mouseup(trackUp)
 				;
@@ -677,7 +677,7 @@ $.Jcrop = function(obj,opt)
 			$trk.css({zIndex:290});
 			if (trackDoc)
 			{
-				$(document)
+				$(document).add(window.top.document)
 					.unbind('mousemove',trackMove)
 					.unbind('mouseup',trackUp)
 				;
