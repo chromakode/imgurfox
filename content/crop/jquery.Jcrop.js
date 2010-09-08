@@ -144,7 +144,7 @@ $.Jcrop = function(obj,opt)
 	['top', 'bottom', 'left', 'right'].forEach(function(side) {
 		dark['$'+side] = $('<div />');
 		$darks = $darks.add(dark['$'+side]);
-	});
+	});	
 	
 	$darks.css({
 		position: 'absolute',
@@ -552,6 +552,9 @@ $.Jcrop = function(obj,opt)
 		function update()/*{{{*/
 		{
 			var c = Coords.getFixed();
+			
+			offset = $origEl.offset();
+			size = {x: $origEl.width(), y: $origEl.height()};
 
 			resize(c.w,c.h);
 			moveto(c.x,c.y);
@@ -633,6 +636,8 @@ $.Jcrop = function(obj,opt)
 
 		$hdl_holder.append($track);
 		disableHandles();
+		
+		$(window).resize(update);
 
 		return {
 			updateVisible: updateVisible,
@@ -922,15 +927,16 @@ $.Jcrop = function(obj,opt)
 		{
 			nw = w;
 			nh = (w/$obj.width()) * $obj.height();
+			$obj.width(nw).height(nh);
 		}
 		if ((nh > h) && h > 0)
 		{
 			nh = h;
 			nw = (h/$obj.height()) * $obj.width();
+			$obj.width(nw).height(nh);
 		}
 		xscale = $obj.width() / nw;
 		yscale = $obj.height() / nh;
-		$obj.width(nw).height(nh);
 	};
 	/*}}}*/
 	function unscale(c)/*{{{*/
