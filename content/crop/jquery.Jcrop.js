@@ -574,7 +574,6 @@ $.Jcrop = function(obj,opt)
 		function show()/*{{{*/
 		{
 			$sel.show();
-			$origEl.css('opacity',options.bgOpacity);
 			$darks.show();
 			awake = true;
 		};
