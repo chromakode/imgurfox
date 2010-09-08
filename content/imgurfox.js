@@ -135,22 +135,20 @@ var ImgurFoxWindow = (function() {
              "chrome://imgurfox-crop/content/jquery.Jcrop.js"],
             function afterLoaded() {
               // Run this code within the iframe.
-              iframe.contentWindow.location.href = "javascript:(" + function() {
-                function saveCoords(c) {
-                  window.cropCoords = JSON.stringify(c);
-                }
-              
+              iframe.contentWindow.location.href = "javascript:(" + function() {              
                 var dde = window.top.document.documentElement,
                     crop = $.Jcrop(document.body, {
                       boundary: 0,
-                      onChange: saveCoords,
                       onDblClick: function(c) {
-                        saveCoords(c);
                         var event = document.createEvent("Events");
                         event.initEvent("CropFinished", true, false);
                         document.body.dispatchEvent(event);
                       }
                     });
+                    
+                window.getCoords = function() {
+                  return JSON.stringify(crop.tellSelect());
+                }
                     
                 $(".jcrop-holder").hide();
                 
@@ -180,7 +178,7 @@ var ImgurFoxWindow = (function() {
       }
       
       function performCrop(iframe) {
-        let cropCoords = nativeJSON.decode(iframe.contentWindow.wrappedJSObject.cropCoords);
+        let cropCoords = nativeJSON.decode(iframe.contentWindow.wrappedJSObject.getCoords());
         endCrop(iframe);
         let screenshotData = ImgurFoxWindow.grabScreenshot(cropCoords);
         callback(screenshotData);
