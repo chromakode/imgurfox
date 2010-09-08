@@ -535,7 +535,7 @@ $.Jcrop = function(obj,opt)
 
 			updateVisible();
 		};
-		/*}}}*/awake
+		/*}}}*/
 
 		// Internal Methods
 		function updateVisible()/*{{{*/
@@ -622,6 +622,11 @@ $.Jcrop = function(obj,opt)
 			refresh();
 		};
 		/*}}}*/
+		
+		function isAwake() {/*{{{*/
+		  return awake;
+		}
+		/*}}}*/
 
 		var $track = newTracker().mousedown(createDragger('move'))
 				.css({ cursor: 'move', position: 'absolute', zIndex: 360 })
@@ -640,7 +645,8 @@ $.Jcrop = function(obj,opt)
 			showHandles: showHandles,
 			disableHandles: disableHandles,
 			animMode: animMode,
-			done: done
+			done: done,
+			isAwake: isAwake
 		};
 	}();
 	/*}}}*/
@@ -953,20 +959,20 @@ $.Jcrop = function(obj,opt)
 	/*}}}*/
 	function newSelection(e)/*{{{*/
 	{
-		if (options.disabled) return false;
-		if (!options.allowSelect) return false;
-		btndown = true;
-		docOffset = getPos($origEl);
-		Selection.disableHandles();
-		myCursor('crosshair');
-		var pos = mouseAbs(e);
-		Coords.setPressed(pos);
-		Tracker.activateHandlers(selectDrag,doneSelect);
-		KeyManager.watchKeys();
-		Selection.update();
+		if (!options.disabled && options.allowSelect && !Selection.isAwake()) {;
+		  btndown = true;
+		  docOffset = getPos($origEl);
+		  Selection.disableHandles();
+		  myCursor('crosshair');
+		  var pos = mouseAbs(e);
+		  Coords.setPressed(pos);
+		  Tracker.activateHandlers(selectDrag,doneSelect);
+		  KeyManager.watchKeys();
+		  Selection.update();
 
-		e.stopPropagation();
-		e.preventDefault();
+		  e.stopPropagation();
+		  e.preventDefault();
+		}
 		return false;
 	};
 	/*}}}*/
