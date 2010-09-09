@@ -139,16 +139,16 @@ var ImgurFoxWindow = (function() {
                 var dde = window.top.document.documentElement,
                     crop;
                 
-                function finishCrop(cancel) {
-                  if (cancel) {
-                    crop.cancel();
-                    crop.release();
-                    //crop = null;
-                  }
-                
+                function finishCrop() {
                   var event = document.createEvent("Events");
                   event.initEvent("CropFinished", true, false);
                   document.body.dispatchEvent(event);
+                }
+                
+                function cancelCrop() {
+                  crop.cancel();
+                  crop.release();
+                  finishCrop();
                 }
                     
                 window.getCoords = function() {
@@ -159,7 +159,7 @@ var ImgurFoxWindow = (function() {
                 $(window).keydown(function(e) {
                   // ESC Key
                   if (e.which == 27) {
-                    finishCrop(true);
+                    cancelCrop(true);
                   }
                 })
                 
