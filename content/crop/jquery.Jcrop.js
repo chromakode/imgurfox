@@ -493,7 +493,7 @@ $.Jcrop = function(obj,opt)
 		/*}}}*/
 		function moveHandles(c)/*{{{*/
 		{
-			var midvert  = Math.round((c.h / 2) - hhs),
+			var midvert = Math.round((c.h / 2) - hhs),
 				midhoriz = Math.round((c.w / 2) - hhs),
 				north = west = -hhs+1,
 				east = c.w - hhs,
@@ -626,7 +626,7 @@ $.Jcrop = function(obj,opt)
 		/*}}}*/
 		
 		function isAwake() {/*{{{*/
-		  return awake;
+			return awake;
 		}
 		/*}}}*/
 
@@ -707,14 +707,14 @@ $.Jcrop = function(obj,opt)
 			if (btndown)
 			{
 				btndown = false;
-        var now = new Date();
-        
+				var now = new Date();
+				
 				onDone(mouseAbs(e));
  				options.onSelect(unscale(Coords.getFixed()));
 				if (lastClick && now - lastClick < 200) {
-  				options.onDblClick(unscale(Coords.getFixed()));
-  		  }
-		    lastClick = now;
+					options.onDblClick(unscale(Coords.getFixed()));
+				}
+				lastClick = now;
 				toBack();
 				onMove = function() { };
 				onDone = function() { };
@@ -965,18 +965,18 @@ $.Jcrop = function(obj,opt)
 	function newSelection(e)/*{{{*/
 	{
 		if (!options.disabled && options.allowSelect && !Selection.isAwake()) {;
-		  btndown = true;
-		  docOffset = getPos($origEl);
-		  Selection.disableHandles();
-		  myCursor('crosshair');
-		  var pos = mouseAbs(e);
-		  Coords.setPressed(pos);
-		  Tracker.activateHandlers(selectDrag,doneSelect);
-		  KeyManager.watchKeys();
-		  Selection.update();
+			btndown = true;
+			docOffset = getPos($origEl);
+			Selection.disableHandles();
+			myCursor('crosshair');
+			var pos = mouseAbs(e);
+			Coords.setPressed(pos);
+			Tracker.activateHandlers(selectDrag,doneSelect);
+			KeyManager.watchKeys();
+			Selection.update();
 
-		  e.stopPropagation();
-		  e.preventDefault();
+			e.stopPropagation();
+			e.preventDefault();
 		}
 		return false;
 	};
@@ -1077,11 +1077,11 @@ $.Jcrop = function(obj,opt)
 	/*}}}*/
 	function tellSelect()/*{{{*/
 	{
-	  if (Selection.isAwake()) {
-  		return unscale(Coords.getFixed());
-    } else {
-      return false;
-    }
+		if (Selection.isAwake()) {
+			return unscale(Coords.getFixed());
+		} else {
+			return false;
+		}
 	};
 	/*}}}*/
 	function tellScaled()/*{{{*/
