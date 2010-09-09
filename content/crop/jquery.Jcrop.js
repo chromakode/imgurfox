@@ -1077,7 +1077,11 @@ $.Jcrop = function(obj,opt)
 	/*}}}*/
 	function tellSelect()/*{{{*/
 	{
-		return unscale(Coords.getFixed());
+	  if (Selection.isAwake()) {
+  		return unscale(Coords.getFixed());
+    } else {
+      return false;
+    }
 	};
 	/*}}}*/
 	function tellScaled()/*{{{*/

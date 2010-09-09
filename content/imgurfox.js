@@ -135,20 +135,38 @@ var ImgurFoxWindow = (function() {
              "chrome://imgurfox-crop/content/jquery.Jcrop.js"],
             function afterLoaded() {
               // Run this code within the iframe.
-              iframe.contentWindow.location.href = "javascript:(" + function() {              
+              iframe.contentWindow.location.href = "javascript:(" + function() {
                 var dde = window.top.document.documentElement,
-                    crop = $.Jcrop(document.body, {
-                      boundary: 0,
-                      onDblClick: function(c) {
-                        var event = document.createEvent("Events");
-                        event.initEvent("CropFinished", true, false);
-                        document.body.dispatchEvent(event);
-                      }
-                    });
+                    crop;
+                
+                function finishCrop(cancel) {
+                  if (cancel) {
+                    crop.cancel();
+                    crop.release();
+                    //crop = null;
+                  }
+                
+                  var event = document.createEvent("Events");
+                  event.initEvent("CropFinished", true, false);
+                  document.body.dispatchEvent(event);
+                }
                     
                 window.getCoords = function() {
-                  return JSON.stringify(crop.tellSelect());
+                  var coords = crop.tellSelect();
+                  return JSON.stringify(coords);
                 }
+                
+                $(window).keydown(function(e) {
+                  // ESC Key
+                  if (e.which == 27) {
+                    finishCrop(true);
+                  }
+                })
+                
+                crop = $.Jcrop(document.body, {
+                  boundary: 0,
+                  onDblClick: finishCrop
+                });
                     
                 $(".jcrop-holder").hide();
                 
@@ -180,8 +198,10 @@ var ImgurFoxWindow = (function() {
       function performCrop(iframe) {
         let cropCoords = nativeJSON.decode(iframe.contentWindow.wrappedJSObject.getCoords());
         endCrop(iframe);
-        let screenshotData = ImgurFoxWindow.grabScreenshot(cropCoords);
-        callback(screenshotData);
+        if (cropCoords) {
+          let screenshotData = ImgurFoxWindow.grabScreenshot(cropCoords);
+          callback(screenshotData);
+        }
       }
       
       let iframe = initCrop();
