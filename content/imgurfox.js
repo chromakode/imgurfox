@@ -164,6 +164,7 @@ var ImgurFoxWindow = (function() {
                 })
                 
                 crop = $.Jcrop(document.body, {
+                  allowSelect: false,
                   boundary: 0,
                   onDblClick: finishCrop
                 });

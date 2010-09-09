@@ -964,7 +964,7 @@ $.Jcrop = function(obj,opt)
 	/*}}}*/
 	function newSelection(e)/*{{{*/
 	{
-		if (!options.disabled && options.allowSelect && !Selection.isAwake()) {;
+		if (!options.disabled && options.allowSelect) {
 			btndown = true;
 			docOffset = getPos($origEl);
 			Selection.disableHandles();
