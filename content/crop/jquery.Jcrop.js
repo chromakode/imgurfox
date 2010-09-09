@@ -696,7 +696,7 @@ $.Jcrop = function(obj,opt)
 		/*}}}*/
 		function trackMove(e)/*{{{*/
 		{
-			onMove(mouseAbs(e));
+			onMove && onMove(mouseAbs(e));
 		};
 		/*}}}*/
 		function trackUp(e)/*{{{*/
@@ -709,10 +709,10 @@ $.Jcrop = function(obj,opt)
 				btndown = false;
 				var now = new Date();
 				
-				onDone(mouseAbs(e));
+				onDone && onDone(mouseAbs(e));
  				options.onSelect(unscale(Coords.getFixed()));
 				if (lastClick && now - lastClick < 200) {
-					options.onDblClick(unscale(Coords.getFixed()));
+					options.onDblClick && options.onDblClick(unscale(Coords.getFixed()));
 				}
 				lastClick = now;
 				toBack();
