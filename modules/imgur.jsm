@@ -95,9 +95,15 @@ var Imgur = {
       }
     },
     
+    forget: function() {
+      this.storage.clear();
+      this.authData = this._newAuthData();
+      this.isAuthenticated = false;
+    },
+    
     authorize: function(statusCallback) {
       function requestToken(callback) {
-        Imgur.oauth.authData = this._newAuthData();
+        Imgur.oauth.authData = Imgur.oauth._newAuthData();
         Imgur.oauth._tokenRequest("https://api.imgur.com/oauth/request_token", callback);
       }
       
@@ -129,6 +135,8 @@ var Imgur = {
       function accessToken(callback) {
         Imgur.oauth._tokenRequest("https://api.imgur.com/oauth/access_token", callback);
       }
+      
+      this.forget();
       
       // Let's do this thing!
       let self = this;
