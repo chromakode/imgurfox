@@ -50,7 +50,7 @@ var Imgur = {
   upload: function(base64data) {
     let msg = {
       method: "POST",
-      action: "http://api.imgur.com/2/upload",
+      action: "http://api.imgur.com/2/upload.json",
       parameters: {
         image: base64data,
         type: "base64"
