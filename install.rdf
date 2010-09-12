@@ -22,7 +22,7 @@
     <em:creator>Imgur</em:creator>
     <em:developer>Chromakode</em:developer>
     <em:developer>Koryk</em:developer>
-    <em:iconURL>chrome://imgurfox/skin/imgurfox.png</em:iconURL>
+    <em:iconURL>chrome://imgurfox/skin/imgur.png</em:iconURL>
     <em:homepageURL>http://www.imgur.com/</em:homepageURL>
   </RDF:Description>      
 </RDF:RDF>
