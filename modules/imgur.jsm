@@ -133,9 +133,9 @@ var Imgur = {
               heading = doc.getElementsByTagName("h1")[0],
               allow = null;
           
-          if (/\bdenied\b/.test(heading)) {
+          if (/\bdenied\b/.test(heading.className)) {
             allow = false;
-          } else if (/\ballowed\b/.test(heading) || heading.textContent == "Success!") {
+          } else if (/\ballowed\b/.test(heading.className)) {
             allow = true;
           }
           
