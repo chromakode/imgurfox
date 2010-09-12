@@ -1,12 +1,31 @@
 var ImgurFoxWindow = (function() {
-  let preferences = Components.classes["@mozilla.org/preferences-service;1"]
-                    .getService(Components.interfaces.nsIPrefService)
-                    .getBranch("extensions.imgurfox@imgur.com.");
-  let stringBundle = Components.classes["@mozilla.org/intl/stringbundle;1"]
-                               .getService(Components.interfaces.nsIStringBundleService)
-                               .createBundle("chrome://imgurfox/locale/imgurfox.properties");
-  let nativeJSON = Components.classes["@mozilla.org/dom/json;1"]
-                             .createInstance(Components.interfaces.nsIJSON);
+  Components.utils.import("resource://imgurfox/oauth.jsm");
+
+  let preferences =
+    Components
+      .classes["@mozilla.org/preferences-service;1"]
+      .getService(Components.interfaces.nsIPrefService)
+      .getBranch("extensions.imgurfox@imgur.com.");
+  
+  let stringBundle =
+    Components
+      .classes["@mozilla.org/intl/stringbundle;1"]
+      .getService(Components.interfaces.nsIStringBundleService)
+      .createBundle("chrome://imgurfox/locale/imgurfox.properties");
+  
+  let nativeJSON =
+    Components
+      .classes["@mozilla.org/dom/json;1"]
+      .createInstance(Components.interfaces.nsIJSON);
+  
+  let passwordManager =
+    Components
+      .classes["@mozilla.org/login-manager;1"]
+      .getService(Components.interfaces.nsILoginManager);
+              
+  let nsLoginInfo =
+    new Components.Constructor("@mozilla.org/login-manager/loginInfo;1",
+                               Components.interfaces.nsILoginInfo, "init");
   
   let imageFileReg = /\.(jpg|jpeg|gif|png|apng|tiff|bmp|pdf|xcf)(\?.*)?$/i;
   
@@ -31,6 +50,8 @@ var ImgurFoxWindow = (function() {
           menuitem.hidden = !showMenuItem;
         });
       }, false)
+      
+      Imgur.oauth.load();
     },
     
     onUnload: function() {
@@ -218,35 +239,199 @@ var ImgurFoxWindow = (function() {
   }
   
   var Imgur = {
-    api_key: "24bf6070f45ed716e8cf9324baebddbd",
+    apiKey: "24bf6070f45ed716e8cf9324baebddbd",
     
     transload: function(src, edit) {
-      openUILinkIn("http://imgur.com/api/upload?"+(edit ? "edit&" : "")+"url="+src, "tab");
+      let msg = {
+        method: "GET",
+        action: "http://api.imgur.com/2/upload",
+        parameters: {
+          url: src,
+        }
+      };
+      
+      if (edit) { msg.parameters.edit = edit; }
+      if (this.oauth.isAuthenticated) {
+        this.oauth.authenticateMsg(msg);
+      } else {
+        msg.parameters.key = this.apiKey;
+      }
+      gBrowser.selectedTab = gBrowser.addTab(this._url(msg));
     },
   
     upload: function(base64data) {
-      let req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance();
-      req.open("POST", "http://imgur.com/api/upload.json", true);
-      let imageTab = gBrowser.loadOneTab("http://imgur.com/working/", null, null, null, false);
-      req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      let msg = {
+        method: "POST",
+        action: "http://api.imgur.com/2/upload",
+        parameters: {
+          image: base64data,
+          type: "base64"
+        }
+      };
+      
+      if (this.oauth.isAuthenticated) {
+        msg.action = "http://api.imgur.com/2/account/images.json";
+        this.oauth.authenticateMsg(msg);
+      } else {
+        msg.parameters.key = this.apiKey;
+      }
+      
+      let imageTab = gBrowser.selectedTab = gBrowser.addTab("http://imgur.com/working/");      
+      Imgur._request(
+        msg,
+        function(req) {
+          data = nativeJSON.decode(req.responseText);
+          gBrowser.getBrowserForTab(imageTab).loadURI((data.upload || data.images).links.imgur_page);
+        }
+      );
+    },
+    
+    oauth: {
+      isAuthenticated: false,
+      
+      _newAuthData: function() {
+        return {
+          consumerKey: "bd42978fb83a5ab9ad4ce2c23e6a109d04c89f835",
+          consumerSecret: "a228260c6a2057edaf343e4b7ed83fa9"
+        };
+      },
+
+      load: function() {
+        let savedLoginInfo = this.storage.load();
+        if (savedLoginInfo) {
+          this.authData = this._newAuthData();
+          this.authData.token = savedLoginInfo.username;
+          this.authData.tokenSecret = savedLoginInfo.password;
+          this.isAuthenticated = true;
+        }
+      },
+      
+      authorize: function(statusCallback) {
+        function requestToken(callback) {
+          Imgur.oauth.authData = this._newAuthData();
+          Imgur.oauth._tokenRequest("https://api.imgur.com/oauth/request_token", callback);
+        }
+        
+        function authorizeWithUser(callback) {
+          // Using that request token, open the authorize page and wait for user feedback.
+          let target = Imgur._url(Imgur.oauth.authenticateMsg({action: "http://api.imgur.com/oauth/authorize"})),
+              authorizeTab = gBrowser.selectedTab = gBrowser.addTab(target),
+              authorizeBrowser = gBrowser.getBrowserForTab(authorizeTab);
+          
+          gBrowser.getBrowserForTab(authorizeTab).addEventListener("load", function() {
+            let doc = authorizeBrowser.contentDocument,
+                heading = doc.getElementsByTagName("h1")[0],
+                allow = null;
+            
+            if (/\bdenied\b/.test(heading)) {
+              allow = false;
+            } else if (/\ballowed\b/.test(heading) || heading.textContent == "Success!") {
+              allow = true;
+            }
+            
+            if (allow != null) {
+              gBrowser.getBrowserForTab(authorizeTab).removeEventListener("load", arguments.callee, true);
+              callback(allow);
+            }
+          }, true);
+        }
+        
+        function accessToken(callback) {
+          Imgur.oauth._tokenRequest("https://api.imgur.com/oauth/access_token", callback);
+        }
+        
+        // Let's do this thing!
+        let self = this;
+        statusCallback("request");
+        requestToken(function() {
+          statusCallback("authorize");
+          authorizeWithUser(function(allow) {
+            if (allow) {
+              statusCallback("allowed");
+              statusCallback("access");
+              accessToken(function() {
+                statusCallback("success");
+                self.isAuthenticated = true;
+                self.storage.save(self.authData);
+              });
+            } else {
+              statusCallback("denied");
+            }
+          });
+        });
+      },
+      
+      authenticateMsg: function(msg) {
+        OAuth.completeRequest(msg, this.authData);
+        OAuth.SignatureMethod.sign(msg, this.authData);
+        return msg;
+      },
+      
+      _tokenRequest: function(action, callback) {
+        var self = this;
+        Imgur._request(
+          this.authenticateMsg({method: "GET", action: action}),
+          function(req) {
+            resp = OAuth.getParameterMap(req.responseText);
+            if (resp.oauth_token) { self.authData.token = resp.oauth_token };
+            if (resp.oauth_token_secret) { self.authData.tokenSecret = resp.oauth_token_secret };
+            callback();
+          }
+        );
+      },
+      
+      storage: {
+        _loginHostname: "chrome://imgurfox",
+        _loginRealm: "Imgur Access Token",
+      
+        load: function() {
+          let logins = passwordManager.findLogins({}, this._loginHostname, null, this._loginRealm);  
+          return logins[0];
+        },
+        
+        save: function(authData) {
+          this.clear();
+          let loginInfo = new nsLoginInfo(this._loginHostname, null, this._loginRealm,
+                                          authData.token, authData.tokenSecret, "", "");
+          passwordManager.addLogin(loginInfo);
+        },
+        
+        clear: function() {
+          let loginInfo = this.load();
+          if (loginInfo) {
+            passwordManager.removeLogin(loginInfo);
+          }
+        }
+      }
+    },
+    
+    _url: function(msg) {
+      return msg.action + "?" + OAuth.formEncode(msg.parameters);
+    },
+    
+    _request: function(msg, callback) {
+      let req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(),
+          target;
+          
+      if (msg.method == "GET") {
+        req.open(msg.method, this._url(msg), true);
+      } else if (msg.method == "POST") {
+        req.open(msg.method, msg.action, true);
+        req.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      }
+      
       req.onreadystatechange = function (e) {
         if (req.readyState == 4) {
           if (req.status == 200) {
-            data = nativeJSON.decode(req.responseText)
-            if (data["rsp"]["stat"] == "ok") {
-              gBrowser.getBrowserForTab(imageTab).loadURI(data["rsp"]["image"]["imgur_page"]);
-            } else {
-              dump("Imgur error: " + data["rsp"]["error_code"]);
-              // FIXME
-            }
+            callback(req);
           } else {
             // FIXME
           }
         }
       };
-      req.send("image="+encodeURIComponent(base64data)+"&key="+encodeURIComponent(this.api_key));
-    },
-  }
+      req.send(msg.method == "GET" ? null : OAuth.formEncode(msg.parameters));
+    }
+  };
   
   var utils = {
     setAttributes: function(el, attrs) { 
@@ -283,7 +468,7 @@ var ImgurFoxWindow = (function() {
     dataFromURI: function(dataURI) {
       return dataURI.replace(/^([^,])*,/, "");
     }
-  }
+  };
   
   return ImgurFoxWindow;
 })();
