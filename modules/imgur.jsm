@@ -28,23 +28,37 @@ var Imgur = {
   apiKey: "24bf6070f45ed716e8cf9324baebddbd",
   
   transload: function(src, edit) {
-    let msg = {
-      method: "GET",
-      action: "http://api.imgur.com/2/upload",
-      parameters: {
-        url: src,
-      }
-    };
-    
-    if (edit) { msg.parameters.edit = edit; }
-    if (this.oauth.isAuthenticated) {
-      this.oauth.authenticateMsg(msg);
-    } else {
-      msg.parameters.key = this.apiKey;
-    }
-    
     let browser = getBrowser();
-    browser.selectedTab = browser.addTab(this._url(msg));
+    if (this.oauth.isAuthenticated) {
+      let msg = {
+        method: "POST",
+        action: "http://api.imgur.com/2/account/images.json",
+        parameters: {
+          image: src,
+          type: "url"
+        }
+      };
+      if (edit) { windowManager.getMostRecentWindow("navigator:browser").alert("FIXME: no authenticated edit support yet. :("); }
+      this.oauth.authenticateMsg(msg);
+      Imgur._request(
+        msg,
+        function(req) {
+          data = nativeJSON.decode(req.responseText);
+          browser.selectedTab = browser.addTab(data.images.links.imgur_page);
+        }
+      );
+    } else {
+      let msg = {
+        method: "GET",
+        action: "http://api.imgur.com/2/upload",
+        parameters: {
+          key: this.apiKey,
+          url: src
+        }
+      };
+      if (edit) { msg.parameters.edit = edit; }
+      browser.selectedTab = browser.addTab(this._url(msg));
+    }
   },
 
   upload: function(base64data) {
