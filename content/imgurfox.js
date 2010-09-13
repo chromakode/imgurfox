@@ -95,7 +95,8 @@ var ImgurFoxWindow = (function() {
         setTimeout(function() {
           callback({
             go: function(url) {
-              gBrowser.getBrowserForTab(workingTab).loadURI(url);
+              let browser = gBrowser.getBrowserForTab(workingTab);
+              if (browser.loadURI) { browser.loadURI(url); }
             },
             close: function() {
               gBrowser.removeTab(workingTab);
