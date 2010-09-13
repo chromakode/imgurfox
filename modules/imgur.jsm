@@ -172,24 +172,30 @@ var Imgur = {
         Imgur.oauth._tokenRequest("https://api.imgur.com/oauth/access_token", callback);
       }
       
+      function status() {
+        try {
+          statusCallback.apply(this, arguments);
+        } catch (e) {}
+      };
+      
       this.forget();
       
       // Let's do this thing!
       let self = this;
-      statusCallback("request");
+      status("request");
       requestToken(function() {
-        statusCallback("authorize");
+        status("authorize");
         authorizeWithUser(function(allow) {
           if (allow) {
-            statusCallback("allowed");
-            statusCallback("access");
+            status("allowed");
+            status("access");
             accessToken(function() {
               self.isAuthenticated = true;
               self.storage.save(self.authData);
-              statusCallback("success");
+              status("success");
             });
           } else {
-            statusCallback("denied");
+            status("denied");
           }
         });
       });
