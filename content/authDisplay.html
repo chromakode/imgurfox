@@ -2,22 +2,16 @@
 <html>
 <head>
   <script src="authDisplay.js" type="application/javascript;version=1.8"></script>
+  <link rel="stylesheet" type="text/css" href="chrome://imgurfox/skin/page.css"/>
   <style type="text/css">
-    body { background-color:#121211; color:#ddddd1; font-family:Helvetica,Arial,sans-serif; width:370px; margin:15px auto; font-size:12px; }
-    #header { margin:5px; }
-    #logo { width:100px; }
-    #content { background-color:#2b2b2b; padding:15px; -moz-border-radius:10px; }
-    h1 { font-family:'Aller',Helvetica,sans-serif; font-size:20px; line-height:18px; font-weight:bold; text-shadow:1px 1px 2px #000000; margin:0; margin-bottom:10px; }
-    p { margin-top:0; }
-    button { background:-moz-linear-gradient(#2b2b2b, #131312); color:white; border:2px solid #444442; -moz-border-radius:8px; font-size:14px; font-weight:bold; padding:5px 15px; margin:10px 5px 0 5px; }
-    button:enabled:hover { background:-moz-linear-gradient(#444442, #141413); }
-    button:enabled:active { background:#121211; }
-    button:disabled { opacity:.75; }
-    .text { background-color:#181817; padding:10px; margin-top:10px; -moz-border-radius:4px; }
+    body.small { width:370px; font-size:12px; }
+    #logo-small { display:none; }
+    .small #logo-small { display:inline; }
+    .small #account-label { font-size:14px; }
     #account { font-size:16px; height:20px; line-height:20px; text-align:center; }
     #account-name { font-weight:bold; margin-left:7px; }
-    #account-name.pro:after { content:"pro"; color:#84d700; padding-left:3px; position:relative; top:-5px; font-size:10px; }
-    #account-label { font-size:14px; color:#ccc; }
+    #account-name.pro:after { content:"pro"; color:#84d700; padding-left:4px; position:relative; top:-5px; font-size:10px; }
+    #account-label { color:#ccc; }
     #loading-indicator { height:20px; vertical-align:middle; display:none; }
     .buttons { text-align:center; }
     .dot, .signed-in #account-name { background:url("chrome://imgurfox/skin/greendot.png") no-repeat left center; padding-left:15px; }
@@ -29,13 +23,13 @@
 </head>
 <body>
   <div id="header">
-    <img id="logo" alt="the simple image sharer" src="chrome://imgurfox/skin/imgur-small.gif"/>
+    <img id="logo-small" alt="the simple image sharer" src="chrome://imgurfox/skin/imgur-small.gif"/>
   </div>
   <div id="content" class="signed-out">
     <h1>Your Imgur Account</h1>
     <div class="text">
-      ImgurFox will upload images anonymously by default.
-      Authorize ImgurFox to upload to your account.
+      <p>ImgurFox will upload images anonymously by default.</p>
+      <p>Authorize ImgurFox to upload to your account.</p>
     </div>
     <div id="account" class="text">
       <img id="loading-indicator" src="chrome://imgurfox/skin/loader.gif"/>

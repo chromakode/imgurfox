@@ -1,0 +1,34 @@
+<!DOCTYPE overlay SYSTEM "chrome://imgurfox/locale/imgurfox.dtd">
+<html>
+<head>
+  <link rel="stylesheet" type="text/css" href="chrome://imgurfox/skin/page.css"/>
+  <link rel="shortcut icon" href="chrome://imgurfox/skin/imgur_small.png" />
+  <style type="text/css">
+    body { width:570px; }
+    iframe { width:570px; border:none; height:230px; overflow:hidden; }
+    #tips p { color:#999; }
+    .menu-example { color:#ddd; background:rgba(255,255,255,.025); padding:0 2px; margin:0 1px; border:1px solid rgba(255,255,255,.1); -moz-border-radius:4px; white-space:nowrap; }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <img id="logo" alt="the simple image sharer" src="chrome://imgurfox/skin/imgur.gif"/>
+  </div>
+  <div id="content" class="signed-out">
+    <h1>Welcome to ImgurFox!</h1>
+    <div class="text">
+      <p>Thanks for installing ImgurFox, the official Imgur Firefox extension.</p>
+      <h2>Use ImgurFox to:</h2>
+      <div id="tips">
+        <h3>Rehost Images</h2>
+        <p>Right click on any image and select <span class="menu-example">Imgur &rarr; Quick Upload</span>.</p>
+        <h3>Screenshot Websites</h2>
+        <p>Right click on any web site and select <span class="menu-example">Imgur &rarr; Upload Screenshot</span>. The current view of the page will be uploaded. To screenshot a specific part of the page, select <span class="menu-example">Imgur &rarr; Upload Selective Screenshot</span>.</p>
+        <h3>Upload from the Clipboard</h2>
+        <p>Right click on any web site and select <span class="menu-example">Imgur &rarr; Upload from Clipboard</span>.</p>
+      </div>
+    </div>
+  </div>
+  <iframe src="authDisplay.html"><iframe>
+</body>
+</html>

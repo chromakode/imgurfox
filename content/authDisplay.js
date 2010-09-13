@@ -1,5 +1,6 @@
 var ImgurFoxAuthDisplay = (function() {
   Components.utils.import("resource://imgurfox/imgur.jsm");
+  Components.utils.import("resource://imgurfox/inject.jsm");
   
   var ImgurFoxAuthDisplay = {
     init: function() {
@@ -7,6 +8,9 @@ var ImgurFoxAuthDisplay = (function() {
     },
     
     onLoad: function() {
+      if (window.location.hash == "#small") {
+        document.body.className = "small";
+      }
       ImgurFoxAuthDisplay.updateStatus();
     },
     
@@ -50,7 +54,7 @@ var ImgurFoxAuthDisplay = (function() {
           success: ""
         }[status];
         
-        if (status == "success") {
+        if (status == "success" || status == "denied") {
           ImgurFoxAuthDisplay.updateStatus();
         }
       });

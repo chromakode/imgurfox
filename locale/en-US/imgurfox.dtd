@@ -4,7 +4,7 @@
 <!ENTITY uploadSelectiveScreenshotCmd.label "Upload Selective Screenshot">
 <!ENTITY uploadSelectiveScreenshotCmd.accesskey "t">
 
-<!ENTITY uploadFromClipboardCmd.label "Upload From Clipboard">
+<!ENTITY uploadFromClipboardCmd.label "Upload from Clipboard">
 <!ENTITY uploadFromClipboardCmd.accesskey "l">
 
 

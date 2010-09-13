@@ -1,5 +1,6 @@
 var ImgurFoxWindow = (function() {
   Components.utils.import("resource://imgurfox/imgur.jsm");
+  Components.utils.import("resource://imgurfox/inject.jsm");
 
   let preferences =
     Components
@@ -23,6 +24,10 @@ var ImgurFoxWindow = (function() {
   let CONTEXT_CHOICE = 0;
   let CONTEXT_UPLOAD = 1;
   let CONTEXT_EDIT   = 2;
+  
+  function dataFromURI(dataURI) {
+    return dataURI.replace(/^([^,])*,/, "");
+  }
 
   var ImgurFoxWindow = {
     init: function() {
@@ -43,10 +48,25 @@ var ImgurFoxWindow = (function() {
       }, false)
       
       Imgur.oauth.load();
+      ImgurFoxWindow.checkFirstRun();
     },
     
     onUnload: function() {
       // :(
+    },
+    
+    checkFirstRun: function() {
+      let firstRun = true;
+      if (preferences.prefHasUserValue("firstRun")) {
+        firstRun = false;
+      }
+      
+      if (firstRun) {
+        setTimeout(function() {
+          gBrowser.selectedTab = gBrowser.addTab("chrome://imgurfox/content/welcome.html");
+        }, 0);
+        preferences.setBoolPref("firstRun", false);
+      }
     },
     
     /* User command handlers */
@@ -87,7 +107,7 @@ var ImgurFoxWindow = (function() {
     
     _uploadScreenshot: function(takeScreenshot) {
       ImgurFoxWindow._createWorkingTab(function(workingTab) {
-        Imgur.upload(utils.dataFromURI(takeScreenshot()), function(imageInfo) {
+        Imgur.upload(dataFromURI(takeScreenshot()), function(imageInfo) {
           workingTab.go(imageInfo.links.imgur_page);
         });
       });
@@ -165,8 +185,8 @@ var ImgurFoxWindow = (function() {
           let iframeDocument = iframe.contentDocument;
           iframeDocument.body.setAttribute("style", "margin:0; width:100%; height:100%;");
           
-          utils.addCSS(iframeDocument, "chrome://imgurfox-crop/content/jquery.Jcrop.css");
-          utils.addScripts(iframeDocument,
+          Inject.css(iframeDocument, "chrome://imgurfox-crop/content/jquery.Jcrop.css");
+          Inject.scripts(iframeDocument,
             ["chrome://imgurfox-crop/content/jquery-1.4.2.min.js",
              "chrome://imgurfox-crop/content/jquery.Jcrop.js"],
             function afterLoaded() {
@@ -252,43 +272,6 @@ var ImgurFoxWindow = (function() {
       }
     },
   }
-  
-  var utils = {
-    setAttributes: function(el, attrs) { 
-      attrs.forEach(function(attr) {
-        el.setAttribute(attr[0], attr[1]);
-      });
-    },
-    
-    addScript: function(doc, src, callback) { 
-      let el = doc.createElement("script");
-      this.setAttributes(el, [["type", "text/javascript"], ["src", src]]);
-      if (callback) { el.addEventListener("load", callback, false); }
-      doc.getElementsByTagName("head")[0].appendChild(el);
-      return el;
-    },
-    
-    addScripts: function(doc, scripts, callback) {
-      if (scripts.length > 0) {
-        this.addScript(doc, scripts.shift(), function() {
-          utils.addScripts(doc, scripts, callback);
-        });
-      } else {
-        if (callback) { callback(); }
-      }
-    },
-    
-    addCSS: function(doc, src) {
-      let el = doc.createElement("link");
-      this.setAttributes(el, [["type", "text/css"], ["rel", "stylesheet"], ["href", src]]);
-      doc.getElementsByTagName("head")[0].appendChild(el);
-      return el;
-    },
-    
-    dataFromURI: function(dataURI) {
-      return dataURI.replace(/^([^,])*,/, "");
-    }
-  };
   
   return ImgurFoxWindow;
 })();
