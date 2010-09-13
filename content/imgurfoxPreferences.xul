@@ -3,8 +3,8 @@
 <!DOCTYPE preferences SYSTEM "chrome://imgurfox/locale/preferences.dtd">
 <prefwindow id="imgurfoxPreferences" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul" 
             title="&prefwindow.title;">
-  <prefpane label="&general.title;" src="chrome://imgurfox/content/authDisplay.xul">
-    <vbox id="imgur-auth-display">
-    </vbox>
+  <prefpane label="&account.title;" image="chrome://imgurfox/skin/imgur.png" flex="1">
+    <iframe src="chrome://imgurfox/content/authDisplay.html" flex="1" width="400px" height="280px"/>
   </prefpane>
 </prefwindow>
+

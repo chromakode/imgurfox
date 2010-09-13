@@ -40,7 +40,7 @@ var Imgur = {
       };
       if (edit) { windowManager.getMostRecentWindow("navigator:browser").alert("FIXME: no authenticated edit support yet. :("); }
       this.oauth.authenticateMsg(msg);
-      Imgur._request(
+      this._request(
         msg,
         function(req) {
           data = nativeJSON.decode(req.responseText);
@@ -80,13 +80,37 @@ var Imgur = {
     
     let browser = getBrowser(),
         imageTab = browser.selectedTab = browser.addTab("http://imgur.com/working/");
-    Imgur._request(
+    this._request(
       msg,
       function(req) {
         data = nativeJSON.decode(req.responseText);
         browser.getBrowserForTab(imageTab).loadURI((data.upload || data.images).links.imgur_page);
       }
     );
+  },
+  
+  register: function() {
+    let url = "http://imgur.com/register",
+        browser = getBrowser(),
+        openTabs = Array.prototype.filter.call(browser.tabContainer.childNodes, function(t) {
+          return browser.getBrowserForTab(t).contentWindow.location == url;
+        });
+    
+    browser.selectedTab = openTabs[0] ? openTabs[0] : browser.addTab(url);
+  },
+  
+  accountInfo: function(callback) {
+    if (this.oauth.isAuthenticated) {
+      Imgur._request(
+        this.oauth.authenticateMsg({ method: "GET", action: "http://api.imgur.com/2/account.json" }),
+        function(req) {
+          data = nativeJSON.decode(req.responseText);
+          callback(data);
+        }
+      );
+    } else {
+      callback(null);
+    }
   },
   
   oauth: {
@@ -162,9 +186,9 @@ var Imgur = {
             statusCallback("allowed");
             statusCallback("access");
             accessToken(function() {
-              statusCallback("success");
               self.isAuthenticated = true;
               self.storage.save(self.authData);
+              statusCallback("success");
             });
           } else {
             statusCallback("denied");

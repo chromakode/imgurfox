@@ -1,0 +1,50 @@
+<!DOCTYPE overlay SYSTEM "chrome://imgurfox/locale/imgurfox.dtd">
+<html>
+<head>
+  <script src="authDisplay.js" type="application/javascript;version=1.8"></script>
+  <style type="text/css">
+    body { background-color:#121211; color:#ddddd1; font-family:Helvetica,Arial,sans-serif; width:370px; margin:15px auto; font-size:12px; }
+    #header { margin:5px; }
+    #logo { width:100px; }
+    #content { background-color:#2b2b2b; padding:15px; -moz-border-radius:10px; }
+    h1 { font-family:'Aller',Helvetica,sans-serif; font-size:20px; line-height:18px; font-weight:bold; text-shadow:1px 1px 2px #000000; margin:0; margin-bottom:10px; }
+    p { margin-top:0; }
+    button { background:-moz-linear-gradient(#2b2b2b, #131312); color:white; border:2px solid #444442; -moz-border-radius:8px; font-size:14px; font-weight:bold; padding:5px 15px; margin:10px 5px 0 5px; }
+    button:hover { background:-moz-linear-gradient(#444442, #141413); }
+    button:active { background:#121211; }
+    .text { background-color:#181817; padding:10px; margin-top:10px; -moz-border-radius:4px; }
+    #account { font-size:16px; height:20px; line-height:20px; text-align:center; }
+    #account-name { font-weight:bold; margin-left:7px; }
+    #account-name.pro:after { content:"pro"; color:#84d700; padding-left:3px; position:relative; top:-5px; font-size:10px; }
+    #account-label { font-size:14px; color:#ccc; }
+    #loading-indicator { height:20px; vertical-align:middle; display:none; }
+    .buttons { text-align:center; }
+    .dot, .signed-in #account-name { background:url("chrome://imgurfox/skin/greendot.png") no-repeat left center; padding-left:15px; }
+    .signed-in #imgur-logout, .signed-in #account-name { display:inline; }
+    .signed-in #imgur-register, .signed-in #imgur-signin { display:none; }
+    .signed-out #imgur-logout, .signed-out #account-name { display:none; }
+    .signed-out #imgur-register, .signed-out #imgur-signin { display:inline; }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <img id="logo" alt="the simple image sharer" src="chrome://imgurfox/skin/imgur-small.gif"/>
+  </div>
+  <div id="content" class="signed-out">
+    <h1>Your Imgur Account</h1>
+    <div class="text">
+      ImgurFox will upload images anonymously by default.
+      Authorize ImgurFox to upload to your account.
+    </div>
+    <div id="account" class="text">
+      <img id="loading-indicator" src="chrome://imgurfox/skin/loader.gif"/>
+      <span id="account-label"></span><span id="account-name"></span>
+    </div>
+    <div class="buttons">
+      <button id="imgur-register" onclick="ImgurFoxAuthDisplay.register();">Register</button>
+      <button id="imgur-logout" onclick="ImgurFoxAuthDisplay.logout();">Logout</button>
+      <button id="imgur-signin" onclick="ImgurFoxAuthDisplay.signin();"><span class="dot">Sign in</span></button>
+    </div>
+  </div>
+</body>
+</html>
