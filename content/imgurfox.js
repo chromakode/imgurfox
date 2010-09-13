@@ -87,13 +87,13 @@ var ImgurFoxWindow = (function() {
         if (fullPage) {
           rect.x = 0;
           rect.y = 0;
-          rect.w = win.document.documentElement.clientWidth;
+          rect.w = win.document.documentElement.scrollWidth;
           rect.h = win.document.documentElement.scrollHeight;
         } else {
           rect.x = win.scrollX;
           rect.y = win.scrollY;
-          rect.w = win.innerWidth;
-          rect.h = win.innerHeight;
+          rect.w = win.document.body.clientWidth;
+          rect.h = win.document.body.clientHeight;
         }
       }
       
@@ -148,7 +148,8 @@ var ImgurFoxWindow = (function() {
             function afterLoaded() {
               // Run this code within the iframe.
               iframe.contentWindow.location.href = "javascript:(" + function() {
-                var dde = window.top.document.documentElement,
+                var parentdoc = window.top.document,
+                    dde = parentdoc.documentElement,
                     crop;
                 
                 function finishCrop() {
@@ -186,8 +187,8 @@ var ImgurFoxWindow = (function() {
                 crop.setSelect([
                   dde.scrollLeft + 50,
                   dde.scrollTop + 50,
-                  dde.scrollLeft + dde.clientWidth - 50,
-                  dde.scrollTop + dde.clientHeight - 50]);
+                  dde.scrollLeft + parentdoc.body.clientWidth - 50,
+                  dde.scrollTop + parentdoc.body.clientHeight - 50]);
                   
                 crop.focus();
                 crop.enable();
