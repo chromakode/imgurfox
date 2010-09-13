@@ -27,8 +27,7 @@ function getBrowser() {
 var Imgur = {
   apiKey: "24bf6070f45ed716e8cf9324baebddbd",
   
-  transload: function(src, edit) {
-    let browser = getBrowser();
+  transload: function(src, edit, urlCallback) {
     if (this.oauth.isAuthenticated) {
       let msg = {
         method: "POST",
@@ -44,7 +43,7 @@ var Imgur = {
         msg,
         function(req) {
           data = nativeJSON.decode(req.responseText);
-          browser.selectedTab = browser.addTab(data.images.links.imgur_page);
+          urlCallback(data.images.links.imgur_page);
         }
       );
     } else {
@@ -57,11 +56,11 @@ var Imgur = {
         }
       };
       if (edit) { msg.parameters.edit = edit; }
-      browser.selectedTab = browser.addTab(this._url(msg));
+      urlCallback(this._url(msg));
     }
   },
 
-  upload: function(base64data) {
+  upload: function(base64data, callback) {
     let msg = {
       method: "POST",
       action: "http://api.imgur.com/2/upload.json",
@@ -77,14 +76,12 @@ var Imgur = {
     } else {
       msg.parameters.key = this.apiKey;
     }
-    
-    let browser = getBrowser(),
-        imageTab = browser.selectedTab = browser.addTab("http://imgur.com/working/");
+
     this._request(
       msg,
       function(req) {
         data = nativeJSON.decode(req.responseText);
-        browser.getBrowserForTab(imageTab).loadURI((data.upload || data.images).links.imgur_page);
+        callback(data.upload || data.images);
       }
     );
   },

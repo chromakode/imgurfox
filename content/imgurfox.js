@@ -62,39 +62,62 @@ var ImgurFoxWindow = (function() {
       return false;
     },
     
+    _createWorkingTab: function(callback) {
+      let workingTab = gBrowser.selectedTab = gBrowser.addTab("http://imgur.com/working/");
+          workingBrowser = gBrowser.getBrowserForTab(workingTab);
+          
+      // While waiting for the working indicator page to load completely seems wrong,
+      // we must do this since taking the screenshot will hard freeze the browser. We have to
+      // give the browser a chance to load and render the working page, or else the user will
+      // be left staring at a blank screen.
+      workingBrowser.addEventListener("load", function() {
+        workingBrowser.removeEventListener("load", arguments.callee, true);
+        setTimeout(function() {
+          callback({
+            go: function(url) {
+              gBrowser.getBrowserForTab(workingTab).loadURI(url);
+            },
+            close: function() {
+              gBrowser.removeTab(workingTab);
+            }
+          });
+        }, 0);
+      }, true);
+    },
+    
+    _uploadScreenshot: function(takeScreenshot) {
+      ImgurFoxWindow._createWorkingTab(function(workingTab) {
+        Imgur.upload(utils.dataFromURI(takeScreenshot()), function(imageInfo) {
+          workingTab.go(imageInfo.links.imgur_page);
+        });
+      });
+    },
+    
     uploadImage: function(event, edit) {
-      Imgur.transload(ImgurFoxWindow.contextImageURI.spec, edit);
+      let src = ImgurFoxWindow.contextImageURI.spec;
+      ImgurFoxWindow._createWorkingTab(function(workingTab) {
+        Imgur.transload(src, edit, function(url) {
+          workingTab.go(url);
+        });
+      });
     },
     
     uploadScreenshot: function(event) {
-      Imgur.upload(utils.dataFromURI(this.grabScreenshot()));
+      let win = gBrowser.contentWindow;
+      ImgurFoxWindow._uploadScreenshot(function() ImgurFoxWindow.grabScreenshot(win));
     },
     
     uploadSelectiveScreenshot: function(event) {
-      this.grabSelectiveScreenshot(function(screenshotData) {
-        Imgur.upload(utils.dataFromURI(screenshotData));
-      });
+      ImgurFoxWindow.grabSelectiveScreenshot(ImgurFoxWindow._uploadScreenshot);
     },
     
     /* Browser screenshot helpers */
     
-    grabScreenshot: function(rect, fullPage) {
+    grabScreenshot: function(win, rect) {
       let canvas = document.getElementById("imgurfox-canvas");
-      let win = gBrowser.contentWindow;
       
       if (!rect) {
-        rect = {};
-        if (fullPage) {
-          rect.x = 0;
-          rect.y = 0;
-          rect.w = win.document.documentElement.scrollWidth;
-          rect.h = win.document.documentElement.scrollHeight;
-        } else {
-          rect.x = win.scrollX;
-          rect.y = win.scrollY;
-          rect.w = win.document.body.clientWidth;
-          rect.h = win.document.body.clientHeight;
-        }
+        rect = {x: win.scrollX, y: win.scrollY, w: win.document.body.clientWidth, h: win.document.body.clientHeight};
       }
       
       canvas.width = rect.w;
@@ -107,7 +130,9 @@ var ImgurFoxWindow = (function() {
     },
     
     grabSelectiveScreenshot: function(callback) {
-      var notificationValue = "imgurfox-selective-screenshot";
+      let notificationValue = "imgurfox-selective-screenshot",
+          pageWindow = gBrowser.contentWindow,
+          pageDocument = gBrowser.contentDocument;
     
       function initBar(iframe) {
         let notificationBox = gBrowser.getNotificationBox();
@@ -122,8 +147,7 @@ var ImgurFoxWindow = (function() {
     
       function initCrop() {
         // Make an iframe on top of the page content.
-        let pageDocument = gBrowser.contentDocument,
-            pageDocumentHeight = pageDocument.documentElement.scrollHeight,
+        let pageDocumentHeight = pageDocument.documentElement.scrollHeight,
             overlayId = "_imgurfox-crop-overlay";
         
         if (pageDocument.getElementById(overlayId)) {
@@ -213,8 +237,7 @@ var ImgurFoxWindow = (function() {
         let cropCoords = nativeJSON.decode(iframe.contentWindow.wrappedJSObject.getCoords());
         endCrop(iframe);
         if (cropCoords) {
-          let screenshotData = ImgurFoxWindow.grabScreenshot(cropCoords);
-          callback(screenshotData);
+          callback(function() ImgurFoxWindow.grabScreenshot(pageWindow, cropCoords));
         }
       }
       
