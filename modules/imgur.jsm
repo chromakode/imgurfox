@@ -165,6 +165,7 @@ var Imgur = {
           
           if (allow != null) {
             browser.getBrowserForTab(authorizeTab).removeEventListener("load", arguments.callee, true);
+            if (allow) { browser.removeTab(authorizeTab); }
             callback(allow);
           }
         }, true);
