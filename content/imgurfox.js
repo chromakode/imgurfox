@@ -114,7 +114,7 @@ var ImgurFoxWindow = (function() {
         return notificationBox.appendNotification(
           stringBundle.GetStringFromName("selectiveScreenshot.message"),
           notificationValue, 
-          "chrome://imgurfox/skin/upload_small.png",
+          "chrome://imgurfox/skin/imgur_small.png",
           notificationBox.PRIORITY_INFO_HIGH,
           [{label:"Cancel", accessKey:"C", callback:function() { endCrop(iframe); }},
            {label:"Upload", accessKey:"U", callback:function() { performCrop(iframe); }}]);
