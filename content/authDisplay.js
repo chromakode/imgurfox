@@ -33,11 +33,13 @@ var ImgurFoxAuthDisplay = (function() {
         accountLabelEl.textContent = "You are currently signed out.";
         accountNameEl.textContent = "";
         accountNameEl.className = "";
+        document.getElementById("imgur-signin").disabled = false;
       }
     },
     
-    signin: function() {
+    signin: function(event) {
       ImgurFoxAuthDisplay.setLoading(true);
+      document.getElementById("imgur-signin").disabled = true;
       Imgur.oauth.authorize(function(status) {
         document.getElementById("account-label").textContent = {
           request: "Connecting...",
