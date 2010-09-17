@@ -1,11 +1,11 @@
 <!ENTITY uploadScreenshotCmd.label "Upload Screenshot">
-<!ENTITY uploadScreenshotCmd.accesskey "o">
+<!ENTITY uploadScreenshotCmd.accesskey "U">
 
 <!ENTITY uploadSelectiveScreenshotCmd.label "Upload Selective Screenshot">
-<!ENTITY uploadSelectiveScreenshotCmd.accesskey "t">
+<!ENTITY uploadSelectiveScreenshotCmd.accesskey "S">
 
 <!ENTITY uploadFromClipboardCmd.label "Upload from Clipboard">
-<!ENTITY uploadFromClipboardCmd.accesskey "l">
+<!ENTITY uploadFromClipboardCmd.accesskey "C">
 
 
 
@@ -14,3 +14,6 @@
 
 <!ENTITY uploadEditImageCmd.label "Upload + Edit">
 <!ENTITY uploadEditImageCmd.accesskey "E">
+
+<!ENTITY uploadShareImageCmd.label "Upload + Share">
+<!ENTITY uploadShareImageCmd.accesskey "h">

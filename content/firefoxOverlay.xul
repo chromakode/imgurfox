@@ -13,7 +13,8 @@
         <menu id="context-imgur"
               class="menu-iconic"
               insertafter="context-savepage"
-              label="Imgur">
+              label="Imgur"
+              accesskey="g">
           <menupopup>
           
             <!-- General commands -->
@@ -49,6 +50,45 @@
                       oncommand="ImgurFoxWindow.uploadImage(event, true);"
                       hidden="true"/>
                       
+            <menu id="context-imgur-upload-share"
+                  class="menu-iconic"
+                  label="&uploadShareImageCmd.label;"
+                  accesskey="&uploadShareImageCmd.accesskey;">
+              <menupopup>
+              
+                <menuitem id="context-imgur-upload-share-reddit"
+                          label="Reddit"
+                          accesskey="R"
+                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'reddit');"/>
+                          
+                <menuitem id="context-imgur-upload-share-digg"
+                          label="Digg"
+                          accesskey="D"
+                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'digg');"/>
+                          
+                <menuitem id="context-imgur-upload-share-twitter"
+                          label="Twitter"
+                          accesskey="T"
+                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'twitter');"/>
+                          
+                <menuitem id="context-imgur-upload-share-facebook"
+                          label="Facebook"
+                          accesskey="F"
+                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'facebook');"/>
+                          
+                <menuitem id="context-imgur-upload-share-stumbleupon"
+                          label="StumbleUpon"
+                          accesskey="S"
+                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'stumbleupon');"/>
+                          
+                <menuitem id="context-imgur-upload-share-buzz"
+                          label="Google Buzz"
+                          accesskey="B"
+                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'buzz');"/>
+                          
+              </menupopup>
+            </menu>
+            
           </menupopup>
         </menu>
       </popup>

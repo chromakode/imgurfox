@@ -1,5 +1,6 @@
 var ImgurFoxWindow = (function() {
   Components.utils.import("resource://imgurfox/imgur.jsm");
+  Components.utils.import("resource://imgurfox/shareto.jsm");
   Components.utils.import("resource://imgurfox/inject.jsm");
 
   let preferences =
@@ -123,11 +124,11 @@ var ImgurFoxWindow = (function() {
       });
     },
     
-    uploadImage: function(event, edit) {
+    uploadImage: function(event, edit, share) {
       let src = ImgurFoxWindow.contextImageURI.spec;
       ImgurFoxWindow._createWorkingTab(function(workingTab) {
         Imgur.transload(src, edit, function(url) {
-          workingTab.go(url);
+          workingTab.go(share ? ShareTo[share](url) : url);
         });
       });
     },
