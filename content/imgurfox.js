@@ -47,7 +47,7 @@ var ImgurFoxWindow = (function() {
           Array.prototype.forEach.call(imageMenuItems, function(menuitem) {
             menuitem.hidden = !showMenuItem;
           });
-          imgurMenu.hidden = false;
+          imgurMenu.hidden = false || (gContextMenu.onLink && !imageURI);
         } else {
           imgurMenu.hidden = true;
         }
