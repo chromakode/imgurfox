@@ -37,13 +37,16 @@ var Imgur = {
           type: "url"
         }
       };
-      if (edit) { windowManager.getMostRecentWindow("navigator:browser").alert("FIXME: no authenticated edit support yet. :("); }
       this.oauth.authenticateMsg(msg);
       this._request(
         msg,
         function(req) {
           data = nativeJSON.decode(req.responseText);
-          urlCallback(data.images.links.imgur_page);
+          if (edit) {
+            urlCallback("http://imgur.com/correct?hash="+data.images.image.hash+"&deletehash="+data.images.image.deletehash);
+          } else {
+            urlCallback(data.images.links.imgur_page);
+          }
         }
       );
     } else {
