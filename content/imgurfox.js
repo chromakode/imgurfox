@@ -81,11 +81,14 @@ var ImgurFoxWindow = (function() {
       if (gContextMenu.onImage) {
         // Right clicked on an image
         return gContextMenu.target.currentURI;
+      } else if (gContextMenu.hasBGImage) {
+        return makeURI(gContextMenu.bgImageURL);
       } else if (gContextMenu.onLink && imageFileReg.test(gContextMenu.linkURL)) {
         // Right clicked on a link to an image
         return gContextMenu.linkURI;
+      } else {
+        return false;
       }
-      return false;
     },
     
     _createWorkingTab: function(callback) {
