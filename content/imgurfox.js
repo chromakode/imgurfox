@@ -36,15 +36,21 @@ var ImgurFoxWindow = (function() {
     },
     
     onLoad: function() {
-      let contextMenu = document.getElementById("contentAreaContextMenu");
+      let contextMenu = document.getElementById("contentAreaContextMenu"),
+          imgurMenu = document.getElementById("context-imgur");
       contextMenu.addEventListener("popupshowing", function(event) {
+        if (gContextMenu.onLink || !gContextMenu.onTextInput && !gContextMenu.isContentSelected) {
           let imageURI = ImgurFoxWindow.contextImageURI,
               showMenuItem = imageURI && imageURI.scheme == "http";
               imageMenuItems = document.getElementsByClassName("imgur-image-command");
-        
-        Array.prototype.forEach.call(imageMenuItems, function(menuitem) {
-          menuitem.hidden = !showMenuItem;
-        });
+          
+          Array.prototype.forEach.call(imageMenuItems, function(menuitem) {
+            menuitem.hidden = !showMenuItem;
+          });
+          imgurMenu.hidden = false;
+        } else {
+          imgurMenu.hidden = true;
+        }
       }, false)
       
       Imgur.oauth.load();
