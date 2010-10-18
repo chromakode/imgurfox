@@ -32,7 +32,7 @@
             <menuitem id="context-imgur-from-clipboard"
                       label="&uploadFromClipboardCmd.label;"
                       accesskey="&uploadFromClipboardCmd.accesskey;"
-                      oncommand="ImgurFoxWindow.notyet;"/>
+                      oncommand="ImgurFoxWindow.uploadClipboardImage(event);"/>
                       
             <!-- Image commands -->
                       

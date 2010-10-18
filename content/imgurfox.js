@@ -91,6 +91,24 @@ var ImgurFoxWindow = (function() {
         return false;
       }
     },
+
+    getClipboardImageData: function() {
+      let clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard),
+          trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable),
+          flavor = "image/png";
+
+      trans.addDataFlavor(flavor);
+      clip.getData(trans, clip.kGlobalClipboard);  
+      
+      let dataContainer = {}, dataLength = {};
+      try {
+        trans.getTransferData(flavor, dataContainer, dataLength);
+      } catch(e) {
+        return;
+      }
+
+      return "data:"+flavor+";base64,"+btoa(dataContainer.value.data);
+    },
     
     _createWorkingTab: function(callback) {
       let workingTab = gBrowser.selectedTab = gBrowser.addTab("http://imgur.com/working/");
@@ -116,15 +134,15 @@ var ImgurFoxWindow = (function() {
       }, true);
     },
     
-    _uploadScreenshot: function(takeScreenshot) {
+    _uploadImage: function(getImage) {
       ImgurFoxWindow._createWorkingTab(function(workingTab) {
-        Imgur.upload(dataFromURI(takeScreenshot()), function(imageInfo) {
+        Imgur.upload(dataFromURI(getImage()), function(imageInfo) {
           workingTab.go(imageInfo.links.imgur_page);
         });
       });
     },
     
-    uploadImage: function(event, edit, share) {
+    transloadImage: function(event, edit, share) {
       let src = ImgurFoxWindow.contextImageURI.spec;
       ImgurFoxWindow._createWorkingTab(function(workingTab) {
         Imgur.transload(src, edit, function(url) {
@@ -132,14 +150,21 @@ var ImgurFoxWindow = (function() {
         });
       });
     },
+
+    uploadClipboardImage: function(event) {
+      let imageData = ImgurFoxWindow.getClipboardImageData();
+      if (imageData) {
+        ImgurFoxWindow._uploadImage(function() imageData);
+      }
+    },
     
     uploadScreenshot: function(event) {
       let win = gBrowser.contentWindow;
-      ImgurFoxWindow._uploadScreenshot(function() ImgurFoxWindow.grabScreenshot(win));
+      ImgurFoxWindow._uploadImage(function() ImgurFoxWindow.grabScreenshot(win));
     },
     
     uploadSelectiveScreenshot: function(event) {
-      ImgurFoxWindow.grabSelectiveScreenshot(ImgurFoxWindow._uploadScreenshot);
+      ImgurFoxWindow.grabSelectiveScreenshot(ImgurFoxWindow._uploadImage);
     },
     
     /* Browser screenshot helpers */
