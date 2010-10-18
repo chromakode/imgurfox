@@ -20,7 +20,8 @@ var ImgurFoxWindow = (function() {
       .classes["@mozilla.org/dom/json;1"]
       .createInstance(Components.interfaces.nsIJSON);
   
-  let imageFileReg = /\.(jpg|jpeg|gif|png|apng|tiff|bmp|pdf|xcf)(\?.*)?$/i;
+  let imageMimes = "jpg|gif|png|tiff|bmp",
+      imageFileReg = new RegExp("\\.("+imageMimes+"|jpeg|apng|pdf|xcf)(\\?.*)?$", "i");
   
   let CONTEXT_CHOICE = 0;
   let CONTEXT_UPLOAD = 1;
@@ -94,20 +95,22 @@ var ImgurFoxWindow = (function() {
 
     getClipboardImageData: function() {
       let clip = Components.classes["@mozilla.org/widget/clipboard;1"].getService(Components.interfaces.nsIClipboard),
-          trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable),
-          flavor = "image/png";
+          trans = Components.classes["@mozilla.org/widget/transferable;1"].createInstance(Components.interfaces.nsITransferable);
 
-      trans.addDataFlavor(flavor);
+      imageMimes.split("|").forEach(function(mime) {
+        trans.addDataFlavor("image/"+mime);
+      });
+
       clip.getData(trans, clip.kGlobalClipboard);  
       
-      let dataContainer = {}, dataLength = {};
+      let flavorContainer = {}, dataContainer = {}, dataLength = {};
       try {
-        trans.getTransferData(flavor, dataContainer, dataLength);
+        trans.getAnyTransferData(flavorContainer, dataContainer, dataLength);
       } catch(e) {
         return;
       }
 
-      return "data:"+flavor+";base64,"+btoa(dataContainer.value.data);
+      return "data:"+flavorContainer.value+";base64,"+btoa(dataContainer.value.data);
     },
     
     _createWorkingTab: function(callback) {
