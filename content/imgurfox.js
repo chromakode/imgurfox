@@ -270,10 +270,10 @@ var ImgurFoxWindow = (function() {
                 $(".jcrop-holder").fadeIn();
                 return;
               } + ")(["+[
-                pageDocument.documentElement.scrollLeft + 50,
-                pageDocument.documentElement.scrollTop + 50,
-                pageDocument.documentElement.scrollLeft + pageDocument.body.clientWidth - 50,
-                pageDocument.documentElement.scrollTop + pageDocument.body.clientHeight - 50
+                pageWindow.pageXOffset + 50,
+                pageWindow.pageYOffset + 50,
+                pageWindow.pageXOffset + pageWindow.innerWidth - 50,
+                pageWindow.pageYOffset + pageWindow.innerHeight - 50
               ]+"]);";
             }
           );
