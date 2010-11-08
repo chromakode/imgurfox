@@ -675,9 +675,9 @@ $.Jcrop = function(obj,opt)
 			$trk.css({zIndex:450});
 			if (trackDoc)
 			{
-				$(document).add(window.top.document)
-					.mousemove(trackMove)
-					.mouseup(trackUp)
+				$(document)
+					.bind('extmousemove', trackMove)
+					.bind('extmouseup', trackUp)
 				;
 			}
 		}
@@ -687,9 +687,9 @@ $.Jcrop = function(obj,opt)
 			$trk.css({zIndex:290});
 			if (trackDoc)
 			{
-				$(document).add(window.top.document)
-					.unbind('mousemove',trackMove)
-					.unbind('mouseup',trackUp)
+				$(document)
+					.unbind('extmousemove',trackMove)
+					.unbind('extmouseup',trackUp)
 				;
 			}
 		}

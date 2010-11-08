@@ -203,7 +203,7 @@ var ImgurFoxWindow = (function() {
           [{label:"Cancel", accessKey:"C", callback:function() { endCrop(iframe); }},
            {label:"Upload", accessKey:"U", callback:function() { performCrop(iframe); }}]);
       }
-    
+      
       function initCrop() {
         // Make an iframe on top of the page content.
         let pageDocumentHeight = pageDocument.documentElement.scrollHeight,
@@ -230,10 +230,8 @@ var ImgurFoxWindow = (function() {
              "chrome://imgurfox-crop/content/jquery.Jcrop.js"],
             function afterLoaded() {
               // Run this code within the iframe.
-              iframe.contentWindow.location.href = "javascript:(" + function() {
-                var parentdoc = window.top.document,
-                    dde = parentdoc.documentElement,
-                    crop;
+              iframe.contentWindow.location.href = "javascript:(" + function(startingRect) {
+                var crop;
                 
                 function finishCrop() {
                   var event = document.createEvent("Events");
@@ -266,28 +264,54 @@ var ImgurFoxWindow = (function() {
                 });
                     
                 $(".jcrop-holder").hide();
-                
-                crop.setSelect([
-                  dde.scrollLeft + 50,
-                  dde.scrollTop + 50,
-                  dde.scrollLeft + parentdoc.body.clientWidth - 50,
-                  dde.scrollTop + parentdoc.body.clientHeight - 50]);
-                  
+                crop.setSelect(startingRect);
                 crop.focus();
                 crop.enable();
                 $(".jcrop-holder").fadeIn();
                 return;
-              } + ")();";
+              } + ")(["+[
+                pageDocument.documentElement.scrollLeft + 50,
+                pageDocument.documentElement.scrollTop + 50,
+                pageDocument.documentElement.scrollLeft + pageDocument.body.clientWidth - 50,
+                pageDocument.documentElement.scrollTop + pageDocument.body.clientHeight - 50
+              ]+"]);";
             }
           );
         }, false);
-        
+
+
+        // Sadly, it appears an iframe only gets mouse events while the pointer
+        // is above the iframe element. We have to cheat by cloning mouse events
+        // from the containing document in order to accurately move the crop rectangle
+        // when the pointer moves outside the window.
+        function cloneMouseEvent(e, eType, toWin) {
+          eNew = toWin.document.createEvent('MouseEvents');
+          eNew.initMouseEvent(
+            eType, e.canBubble, e.cancelable, e.view,
+            e.detail, e.screenX, e.screenY, e.clientX, e.clientY,
+            e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
+            e.button, e.relatedTarget);
+          return eNew;
+        }
+
+        var proxiedEvents = ['mousemove', 'mouseup'];
+        proxiedEvents.forEach(function(eName) {
+          document.addEventListener(eName, function(e) {
+            if (iframe.contentWindow) {
+              iframe.contentDocument.dispatchEvent(cloneMouseEvent(e, 'ext'+e.type, iframe.contentWindow));
+            } else {
+              // Lazy cleanup; fires once after our iframe goes away.
+              document.removeEventListener(eName, arguments.callee, false);
+            };
+          }, false);
+        });
+
         return iframe;
       }
       
       function endCrop(iframe) {
         iframe.parentNode.removeChild(iframe);
-        
+
         var notification = gBrowser.getNotificationBox().getNotificationWithValue(notificationValue);
         if (notification) { notification.close(); }
       }
