@@ -40,18 +40,18 @@
                       class="imgur-image-command"
                       label="&uploadQuickImageCmd.label;"
                       accesskey="&uploadQuickImageCmd.accesskey;"
-                      oncommand="ImgurFoxWindow.uploadImage(event, false);"
+                      oncommand="ImgurFoxWindow.transloadImage(event, false);"
                       hidden="true"/>
                       
             <menuitem id="context-imgur-upload-edit"
                       class="imgur-image-command"
                       label="&uploadEditImageCmd.label;"
                       accesskey="&uploadEditImageCmd.accesskey;"
-                      oncommand="ImgurFoxWindow.uploadImage(event, true);"
+                      oncommand="ImgurFoxWindow.transloadImage(event, true);"
                       hidden="true"/>
                       
             <menu id="context-imgur-upload-share"
-                  class="menu-iconic"
+                  class="menu-iconic imgur-image-command"
                   label="&uploadShareImageCmd.label;"
                   accesskey="&uploadShareImageCmd.accesskey;">
               <menupopup>
@@ -59,32 +59,32 @@
                 <menuitem id="context-imgur-upload-share-reddit"
                           label="Reddit"
                           accesskey="R"
-                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'reddit');"/>
+                          oncommand="ImgurFoxWindow.transloadImage(event, false, 'reddit');"/>
                           
                 <menuitem id="context-imgur-upload-share-digg"
                           label="Digg"
                           accesskey="D"
-                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'digg');"/>
+                          oncommand="ImgurFoxWindow.transloadImage(event, false, 'digg');"/>
                           
                 <menuitem id="context-imgur-upload-share-twitter"
                           label="Twitter"
                           accesskey="T"
-                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'twitter');"/>
+                          oncommand="ImgurFoxWindow.transloadImage(event, false, 'twitter');"/>
                           
                 <menuitem id="context-imgur-upload-share-facebook"
                           label="Facebook"
                           accesskey="F"
-                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'facebook');"/>
+                          oncommand="ImgurFoxWindow.transloadImage(event, false, 'facebook');"/>
                           
                 <menuitem id="context-imgur-upload-share-stumbleupon"
                           label="StumbleUpon"
                           accesskey="S"
-                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'stumbleupon');"/>
+                          oncommand="ImgurFoxWindow.transloadImage(event, false, 'stumbleupon');"/>
                           
                 <menuitem id="context-imgur-upload-share-buzz"
                           label="Google Buzz"
                           accesskey="B"
-                          oncommand="ImgurFoxWindow.uploadImage(event, false, 'buzz');"/>
+                          oncommand="ImgurFoxWindow.transloadImage(event, false, 'buzz');"/>
                           
               </menupopup>
             </menu>
