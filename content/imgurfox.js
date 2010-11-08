@@ -288,7 +288,10 @@ var ImgurFoxWindow = (function() {
           eNew = toWin.document.createEvent('MouseEvents');
           eNew.initMouseEvent(
             eType, e.canBubble, e.cancelable, e.view,
-            e.detail, e.screenX, e.screenY, e.clientX, e.clientY,
+            e.detail, e.screenX, e.screenY,
+            // Note: we add the scroll offsets to the dom position here because the crop overlay frame
+            // stretches the full size of the page, and thus does not scroll.
+            e.clientX + e.view.pageXOffset, e.clientY + e.view.pageYOffset,
             e.ctrlKey, e.altKey, e.shiftKey, e.metaKey,
             e.button, e.relatedTarget);
           return eNew;
