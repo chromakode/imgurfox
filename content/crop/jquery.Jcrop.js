@@ -744,31 +744,14 @@ $.Jcrop = function(obj,opt)
 	/*}}}*/
 	var KeyManager = function()/*{{{*/
 	{
-		var $keymgr = $('<input type="radio" />')
-				.css({ position: 'absolute', left: '-30px' })
-				.keypress(parseKey)
-				.blur(onBlur),
-
-			$keywrap = $('<div />')
-				.css({
-					position: 'absolute',
-					overflow: 'hidden'
-				})
-				.append($keymgr)
-		;
+		$(document).keypress(parseKey);
 
 		function watchKeys()/*{{{*/
 		{
 			if (options.keySupport)
 			{
-				$keymgr.show();
-				$keymgr.focus();
+				window.focus();
 			}
-		};
-		/*}}}*/
-		function onBlur(e)/*{{{*/
-		{
-			$keymgr.hide();
 		};
 		/*}}}*/
 		function doNudge(e,x,y)/*{{{*/
@@ -802,7 +785,6 @@ $.Jcrop = function(obj,opt)
 		};
 		/*}}}*/
 		
-		if (options.keySupport) $keywrap.appendTo($div);
 		return {
 			watchKeys: watchKeys
 		};
