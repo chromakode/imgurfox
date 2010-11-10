@@ -185,7 +185,7 @@ var ImgurFoxWindow = (function() {
       let canvas = document.getElementById("imgurfox-canvas");
       
       if (!rect) {
-        rect = {x: win.scrollX, y: win.scrollY, w: win.document.body.clientWidth, h: win.document.body.clientHeight};
+        rect = {x: win.pageXOffset, y: win.pageYOffset, w: win.innerWidth, h: win.innerHeight};
       }
       
       canvas.width = rect.w;
