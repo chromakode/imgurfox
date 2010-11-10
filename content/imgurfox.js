@@ -53,7 +53,16 @@ var ImgurFoxWindow = (function() {
         } else {
           imgurMenu.hidden = true;
         }
-      }, false)
+      }, false);
+
+      imgurMenu.addEventListener("popupshowing", function(event) {
+        setTimeout(function() {
+          // This can be slow for huge images, but it seems like the best UI presentation.
+          ImgurFoxWindow._clipboardImageData = ImgurFoxWindow.getClipboardImageData();
+          let clipboardMenuItem = document.getElementById("context-imgur-from-clipboard");
+          clipboardMenuItem.disabled = !ImgurFoxWindow._clipboardImageData;
+        }, 0);
+      }, false);
       
       Imgur.oauth.load();
       ImgurFoxWindow.checkFirstRun();
