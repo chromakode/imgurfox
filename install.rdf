@@ -5,7 +5,7 @@
 
   <RDF:Description RDF:about="urn:mozilla:install-manifest">
     <em:id>imgurfox@imgur.com</em:id>
-    <em:version>0.1pre3</em:version>
+    <em:version>1.0pre1</em:version>
     <em:type>2</em:type>
     <em:optionsURL>chrome://imgurfox/content/imgurfoxPreferences.xul</em:optionsURL>
 
