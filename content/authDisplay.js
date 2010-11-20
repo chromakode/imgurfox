@@ -51,10 +51,13 @@ var ImgurFoxAuthDisplay = (function() {
           allowed: "Recieved authorization...",
           denied: "Access denied.",
           access: "Finalizing...",
-          success: ""
+          success: "",
+          failed: "Unknown failure. Please try again!"
         }[status];
-        
-        if (status == "success" || status == "denied") {
+
+        if (status == "failed") {
+          ImgurFoxAuthDisplay.setLoading(false);
+        } else if (status == "success" || status == "denied") {
           ImgurFoxAuthDisplay.updateStatus();
         }
       });

@@ -129,8 +129,14 @@ var ImgurFoxWindow = (function() {
         workingBrowser.removeEventListener("load", arguments.callee, true);
         setTimeout(function() {
           callback({
+            get browser() {
+              return gBrowser.getBrowserForTab(workingTab);
+            },
+            get notificationBox() {
+              return gBrowser.getNotificationBox(this.browser);
+            },
             go: function(url) {
-              let browser = gBrowser.getBrowserForTab(workingTab);
+              let browser = this.browser;
               if (browser.loadURI) { browser.loadURI(url); }
             },
             close: function() {
@@ -143,18 +149,20 @@ var ImgurFoxWindow = (function() {
     
     _uploadImage: function(getImage) {
       ImgurFoxWindow._createWorkingTab(function(workingTab) {
-        Imgur.upload(dataFromURI(getImage()), function(imageInfo) {
-          workingTab.go(imageInfo.links.imgur_page);
-        });
+        Imgur.upload(dataFromURI(getImage()),
+          function success(imageInfo) { workingTab.go(imageInfo.links.imgur_page); },
+          function error() { ImgurFoxWindow.errorMessage(workingTab.notificationBox); }
+        );
       });
     },
     
     transloadImage: function(event, edit, share) {
       let src = ImgurFoxWindow.contextImageURI.spec;
       ImgurFoxWindow._createWorkingTab(function(workingTab) {
-        Imgur.transload(src, edit, function(url) {
-          workingTab.go(share ? ShareTo[share](url) : url);
-        });
+        Imgur.transload(src, edit,
+          function success(url) { workingTab.go(share ? ShareTo[share](url) : url); },
+          function error() { ImgurFoxWindow.errorMessage(); }
+        );
       });
     },
 
@@ -341,8 +349,18 @@ var ImgurFoxWindow = (function() {
         }, false);
       }
     },
-  }
-  
+
+    /* Etc */
+    errorMessage: function(notificationBox, message) {
+      notificationBox = notificationBox || gBrowser.getNotificationBox();
+      return notificationBox.appendNotification(
+          message || stringBundle.GetStringFromName("imgurError.message"),
+          "imgurfox-error",
+          "chrome://imgurfox/skin/imgur_small.png",
+          notificationBox.PRIORITY_WARNING_MEDIUM);
+    }
+  };
+
   return ImgurFoxWindow;
 })();
 

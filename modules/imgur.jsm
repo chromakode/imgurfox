@@ -27,7 +27,7 @@ function getBrowser() {
 var Imgur = {
   apiKey: "24bf6070f45ed716e8cf9324baebddbd",
   
-  transload: function(src, edit, urlCallback) {
+  transload: function(src, edit, urlCallback, errorHandler) {
     if (this.oauth.isAuthenticated) {
       let msg = {
         method: "POST",
@@ -47,7 +47,7 @@ var Imgur = {
           } else {
             urlCallback(data.images.links.imgur_page);
           }
-        }
+        }, errorHandler
       );
     } else {
       let msg = {
@@ -63,7 +63,7 @@ var Imgur = {
     }
   },
 
-  upload: function(base64data, callback) {
+  upload: function(base64data, callback, errorHandler) {
     let msg = {
       method: "POST",
       action: "http://api.imgur.com/2/upload.json",
@@ -85,7 +85,7 @@ var Imgur = {
       function(req) {
         data = nativeJSON.decode(req.responseText);
         callback(data.upload || data.images);
-      }
+      }, errorHandler
     );
   },
   
@@ -99,14 +99,14 @@ var Imgur = {
     browser.selectedTab = openTabs[0] ? openTabs[0] : browser.addTab(url);
   },
   
-  accountInfo: function(callback) {
+  accountInfo: function(callback, errorHandler) {
     if (this.oauth.isAuthenticated) {
       Imgur._request(
         this.oauth.authenticateMsg({ method: "GET", action: "http://api.imgur.com/2/account.json" }),
         function(req) {
           data = nativeJSON.decode(req.responseText);
           callback(data);
-        }
+        }, errorHandler
       );
     } else {
       callback(null);
@@ -140,9 +140,9 @@ var Imgur = {
     },
     
     authorize: function(statusCallback) {
-      function requestToken(callback) {
+      function requestToken(callback, errorHandler) {
         Imgur.oauth.authData = Imgur.oauth._newAuthData();
-        Imgur.oauth._tokenRequest("https://api.imgur.com/oauth/request_token", callback);
+        Imgur.oauth._tokenRequest("https://api.imgur.com/oauth/request_token", callback, errorHandler);
       }
       
       function authorizeWithUser(callback) {
@@ -171,14 +171,18 @@ var Imgur = {
         }, true);
       }
       
-      function accessToken(callback) {
-        Imgur.oauth._tokenRequest("https://api.imgur.com/oauth/access_token", callback);
+      function accessToken(callback, errorHandler) {
+        Imgur.oauth._tokenRequest("https://api.imgur.com/oauth/access_token", callback, errorHandler);
       }
       
       function status() {
         try {
           statusCallback.apply(this, arguments);
         } catch (e) {}
+      };
+
+      function fail() {
+        status("failed");
       };
       
       this.forget();
@@ -196,12 +200,12 @@ var Imgur = {
               self.isAuthenticated = true;
               self.storage.save(self.authData);
               status("success");
-            });
+            }, fail);
           } else {
             status("denied");
           }
-        });
-      });
+        }, fail);
+      }, fail);
     },
     
     authenticateMsg: function(msg) {
@@ -210,7 +214,7 @@ var Imgur = {
       return msg;
     },
     
-    _tokenRequest: function(action, callback) {
+    _tokenRequest: function(action, callback, errorHandler) {
       var self = this;
       Imgur._request(
         this.authenticateMsg({method: "GET", action: action}),
@@ -219,7 +223,7 @@ var Imgur = {
           if (resp.oauth_token) { self.authData.token = resp.oauth_token };
           if (resp.oauth_token_secret) { self.authData.tokenSecret = resp.oauth_token_secret };
           callback();
-        }
+        }, errorHandler
       );
     },
     
@@ -252,7 +256,7 @@ var Imgur = {
     return msg.action + "?" + OAuth.formEncode(msg.parameters);
   },
   
-  _request: function(msg, callback) {
+  _request: function(msg, callback, errorHandler) {
     let req = Components.classes["@mozilla.org/xmlextras/xmlhttprequest;1"].createInstance(),
         target;
         
@@ -268,7 +272,7 @@ var Imgur = {
         if (req.status == 200) {
           callback(req);
         } else {
-          // FIXME
+          errorHandler(req);
         }
       }
     };
