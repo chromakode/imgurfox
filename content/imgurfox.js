@@ -34,7 +34,6 @@ var ImgurFoxWindow = (function() {
   var ImgurFoxWindow = {
     init: function() {
       window.addEventListener("load", ImgurFoxWindow.onLoad, false);
-      window.addEventListener("unload", ImgurFoxWindow.onUnload, false);
     },
     
     onLoad: function() {
@@ -66,10 +65,6 @@ var ImgurFoxWindow = (function() {
       
       Imgur.oauth.load();
       ImgurFoxWindow.checkFirstRun();
-    },
-    
-    onUnload: function() {
-      // :(
     },
     
     checkFirstRun: function() {
