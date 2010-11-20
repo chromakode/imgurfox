@@ -73,16 +73,16 @@ var ImgurFoxWindow = (function() {
     },
     
     checkFirstRun: function() {
-      let firstRun = true;
-      if (preferences.prefHasUserValue("firstRun")) {
-        firstRun = false;
+      let firstrun = true;
+      if (preferences.prefHasUserValue("firstrun")) {
+        firstrun = false;
       }
       
-      if (firstRun) {
+      if (firstrun) {
         setTimeout(function() {
           gBrowser.selectedTab = gBrowser.addTab("chrome://imgurfox/content/welcome.html");
         }, 0);
-        preferences.setBoolPref("firstRun", false);
+        preferences.setBoolPref("firstrun", false);
       }
     },
     
