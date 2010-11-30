@@ -5,7 +5,7 @@ body { background-color:#121211; color:#ddddd1; font-family:Helvetica,Arial,sans
 #content { background-color:#2b2b2b; padding:15px; -moz-border-radius:10px; }
 h1, h2, h3 { font-family:'Aller',Helvetica,sans-serif; font-weight:bold; text-shadow:1px 1px 2px black; }
 h1 { font-size:20px; line-height:18px; margin:0; margin-bottom:10px; }
-h2 { font-size:16px; line-height:14px; margin:10px; margin-bottom:5px; }
+h2 { font-size:16px; line-height:14px; margin:10px 0; margin-bottom:5px; }
 h3 { font-size:16px; line-height:14px; margin-top:12px; margin-bottom:2px; color:#85bf25; }
 p { margin:0; }
 button { background:-moz-linear-gradient(#2b2b2b, #131312); color:white; border:2px solid #444442; -moz-border-radius:8px; font-size:14px; font-weight:bold; padding:5px 15px; margin:10px 5px 0 5px; }
