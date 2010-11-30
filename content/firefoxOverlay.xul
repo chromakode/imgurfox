@@ -17,23 +17,6 @@
               accesskey="g">
           <menupopup>
           
-            <!-- General commands -->
-
-            <menuitem id="context-imgur-screenshot"
-                      label="&uploadScreenshotCmd.label;"
-                      accesskey="&uploadScreenshotCmd.accesskey;"
-                      oncommand="ImgurFoxWindow.uploadScreenshot(event);"/>
-
-            <menuitem id="context-imgur-selective-screenshot"
-                      label="&uploadSelectiveScreenshotCmd.label;"
-                      accesskey="&uploadSelectiveScreenshotCmd.accesskey;"
-                      oncommand="ImgurFoxWindow.uploadSelectiveScreenshot(event);"/>
-                      
-            <menuitem id="context-imgur-from-clipboard"
-                      label="&uploadFromClipboardCmd.label;"
-                      accesskey="&uploadFromClipboardCmd.accesskey;"
-                      oncommand="ImgurFoxWindow.uploadClipboardImage(event);"/>
-                      
             <!-- Image commands -->
                       
             <menuitem id="context-imgur-upload-quick"
@@ -88,7 +71,24 @@
                           
               </menupopup>
             </menu>
-            
+
+            <!-- General commands -->
+
+            <menuitem id="context-imgur-screenshot"
+                      label="&uploadScreenshotCmd.label;"
+                      accesskey="&uploadScreenshotCmd.accesskey;"
+                      oncommand="ImgurFoxWindow.uploadScreenshot(event);"/>
+
+            <menuitem id="context-imgur-selective-screenshot"
+                      label="&uploadSelectiveScreenshotCmd.label;"
+                      accesskey="&uploadSelectiveScreenshotCmd.accesskey;"
+                      oncommand="ImgurFoxWindow.uploadSelectiveScreenshot(event);"/>
+                      
+            <menuitem id="context-imgur-from-clipboard"
+                      label="&uploadFromClipboardCmd.label;"
+                      accesskey="&uploadFromClipboardCmd.accesskey;"
+                      oncommand="ImgurFoxWindow.uploadClipboardImage(event);"/>
+                      
           </menupopup>
         </menu>
       </popup>
