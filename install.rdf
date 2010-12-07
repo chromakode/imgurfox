@@ -4,7 +4,7 @@
      xmlns:em="http://www.mozilla.org/2004/em-rdf#">
 
   <RDF:Description RDF:about="urn:mozilla:install-manifest">
-    <em:id>imgurfox@imgur.com</em:id>
+    <em:id>giorgio@gilestro.tk</em:id>
     <em:version>1.0</em:version>
     <em:type>2</em:type>
     <em:optionsURL>chrome://imgurfox/content/imgurfoxPreferences.xul</em:optionsURL>
@@ -17,11 +17,12 @@
       </RDF:Description>
     </em:targetApplication>
    
-    <em:name>ImgurFox</em:name>
+    <em:name>Imgur Uploader</em:name>
     <em:description>Uploads images to imgur.com.</em:description>
     <em:creator>Imgur</em:creator>
     <em:developer>Chromakode</em:developer>
-    <em:developer>Koryk</em:developer>
+    <em:developer>Giorgio Gilestro</em:developer>
+    <em:developer>Kory Kirk</em:developer>
     <em:iconURL>chrome://imgurfox/skin/imgur.png</em:iconURL>
     <em:homepageURL>http://www.imgur.com/</em:homepageURL>
   </RDF:Description>      

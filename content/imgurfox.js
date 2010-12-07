@@ -7,7 +7,7 @@ var ImgurFoxWindow = (function() {
     Components
       .classes["@mozilla.org/preferences-service;1"]
       .getService(Components.interfaces.nsIPrefService)
-      .getBranch("extensions.imgurfox@imgur.com.");
+      .getBranch("extensions.giorgio@gilestro.tk.");
   
   let stringBundle =
     Components
