@@ -19,6 +19,11 @@ var ImgurFoxWindow = (function() {
     Components
       .classes["@mozilla.org/dom/json;1"]
       .createInstance(Components.interfaces.nsIJSON);
+
+  let ioService =
+    Components
+      .classes["@mozilla.org/network/io-service;1"]
+      .getService(Components.interfaces.nsIIOService);
   
   let imageMimes = "jpg|gif|png|tiff|bmp",
       imageFileReg = new RegExp("\\.("+imageMimes+"|jpeg|apng|pdf|xcf)(\\?.*)?$", "i");
@@ -137,7 +142,7 @@ var ImgurFoxWindow = (function() {
             },
             go: function(url) {
               let browser = this.browser;
-              if (browser.loadURI) { browser.loadURI(url); }
+              if (browser.loadURI) { browser.loadURI(url, ioService.newURI("http://imgur.com/working/", null, null)); }
             },
             close: function() {
               gBrowser.removeTab(workingTab);
