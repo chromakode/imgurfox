@@ -1,0 +1,85 @@
+.content{
+  border: 10px groove deepskyblue;
+ height: 55px;
+ text-align: center;
+border-radius: 15px;
+ transition: 5s;
+ background-color: black;
+ color: deeppink;
+ filter: drop-shadow(8px 8px 10px black);
+ position: absolute;
+ top: 10%;
+ left: 28%;
+ 
+}
+
+body{
+  background-color: #C2EBE6;
+}
+.form{
+  background-color: #C2EBE6;
+  position: absolute;
+  top: 20%;
+  left: 15%;
+  /* opacity: 40%; */
+  width: 700px;
+  height: 700px;
+  filter: drop-shadow(20px 20px 26px black);
+  border-radius: 30px;
+  color: black;
+  transition: 3s;
+
+}
+.text{
+  color: black;
+  text-align: center;
+}
+.btn1{
+  background-color: gold;
+  position: absolute;
+  left: 55%;
+  top: 80%;
+  width: 130px;
+  height: 50px;
+  border-radius: 30px;
+  filter: drop-shadow(10px 10px 15px black);
+  cursor: grab;
+}
+img{
+  border-radius: 30px;
+  filter: drop-shadow(10px 10px 15px black);
+  
+}
+.form:hover{
+  background-image: url(img2);
+  background-size: cover;
+  transition: 5s;
+  
+  animation: animate 1s linear infinite;
+}
+/* @keyframes animate
+{
+  0%,100%
+  {
+    filter: hue-rotate(0deg);
+  }
+  25%
+  {
+    filter: hue-rotate(90deg);
+  }
+  50%
+  {
+    filter: hue-rotate(360deg);
+  }  
+} */
+
+.btn2{
+  background-color: deeppink;
+  position: absolute;
+  left: 30%;
+  top: 80%;
+  width: 130px;
+  height: 50px;
+  border-radius: 30px;
+  filter: drop-shadow(10px 10px 15px black);
+}
